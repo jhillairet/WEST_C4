@@ -6,15 +6,15 @@ Created on Sat Jul 20 10:52:25 2019
 """
 
 #%%
+import sys; sys.path.append('..')
 from control_room import *
 import matplotlib.pyplot as plt
 from scipy.io import loadmat
 
 #%%
-pulse = 54455  # or 54454
+pulse = 54453 
 
 #%%
-
 P_Q2, t_P_Q2 = get_sig(pulse, signals['IC_P_Q2'])
 P_Q4, t_P_Q4 = get_sig(pulse, signals['IC_P_Q4'])
 Rc_Q2, t_Rc_Q2 = get_sig(pulse, signals['IC_Rc_Q2_avg'])
@@ -32,7 +32,7 @@ ax.legend(fontsize=14, loc='upper left')
 ax.set_title(f'WEST #{pulse}')
 ax.tick_params(labelsize=12)
 #%%
-fig.savefig('WEST_54455_P_IC.png', dpi=150)
+fig.savefig(f'WEST_{pulse}_P_IC.png', dpi=150)
 
 
 #%%
@@ -52,16 +52,16 @@ def time_averaged_profile(data, t_start, t_end):
     
 #%%
 m1, s1, r1 = time_averaged_profile(data_54453, 3.0, 4.0) # no IC
-m2, s2, r2 = time_averaged_profile(data_54453, 4.6, 5.0) # IC ramp-up
-m3, s3, r3 = time_averaged_profile(data_54453, 4.1, 4.6) # IC plateau
+m2, s2, r2 = time_averaged_profile(data_54453, 4.07, 4.5) # IC ramp-up
+m3, s3, r3 = time_averaged_profile(data_54453, 4.6, 4.8) # IC plateau
 
 fig, ax = plt.subplots()
 ax.fill_between(r1, m1-s1, m1+s1, alpha=.4)
 ax.plot(r1, m1, lw=2, label='3.0-4.0 s (no IC)')
-ax.fill_between(r3, m3-s3, m3+s3, alpha=.4)
-ax.plot(r3, m3, lw=2, label='5.2-6.0 (IC ramp-up)')
 ax.fill_between(r2, m2-s2, m2+s2, alpha=.4)
-ax.plot(r2, m2, lw=2, label='4.6-5.0 (IC 1.3 MW)')
+ax.plot(r2, m2, lw=2, label='4.07-4.5 (IC ramp-up)')
+ax.fill_between(r3, m3-s3, m3+s3, alpha=.4)
+ax.plot(r3, m3, lw=2, label='4.6-4.8 (IC 1.3 MW)')
 
 ax.set_yscale('log')
 ax.legend(fontsize=14)
@@ -75,4 +75,4 @@ ax.tick_params(labelsize=12)
 ax.set_title(f'WEST #{pulse}')
 
 #%%
-fig.savefig('WEST_')
+fig.savefig(f'WEST_{pulse}_reflectometry.png', dpi=150)

@@ -58,6 +58,7 @@ def generate_sig_capas_Qi(i=1):
 pulses = [54449, 54453]
 pulses = [54461, 54462]
 pulses = [54461, 54462]
+pulses = [54475]
 
 #%%
 sig_generalQ1 = generate_sig_generalQi(1)
