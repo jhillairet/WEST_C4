@@ -6,7 +6,6 @@
 from control_room import *
 import numpy as np
 
-
 #%%
 def generate_sig_generalQi(i=1):
     sigs_general_Qi = [
@@ -46,7 +45,8 @@ def generate_sig_capas_Qi(i=1):
     sig_probes_Qi = [
         [signals[f'IC_P_Q{i}_left_fwd'], signals[f'IC_P_Q{i}_left_ref']],    
         [signals[f'IC_P_Q{i}_right_fwd'], signals[f'IC_P_Q{i}_right_ref']],
-        [signals[f'IC_Rc_Q{i}_left'], signals[f'IC_Rc_Q{i}_right']],                    
+        [signals[f'IC_Rc_Q{i}_left'], signals[f'IC_Rc_Q{i}_right']],
+                        [signals[f'IC_VSWR_Q{i}_Left'], signals[f'IC_VSWR_Q{i}_Right']],
         [signals[f'IC_ErrSig_Q{i}_left_upper'], signals[f'IC_ErrSig_Q{i}_left_lower']],
         [signals[f'IC_ErrSig_Q{i}_right_upper'], signals[f'IC_ErrSig_Q{i}_right_lower']],  
         [signals[f'IC_Capa_Q{i}_left_upper'], signals[f'IC_Capa_Q{i}_left_lower']],
@@ -58,14 +58,14 @@ def generate_sig_capas_Qi(i=1):
 pulses = [54449, 54453]
 pulses = [54461, 54462]
 pulses = [54461, 54462]
-pulses = [54475]
+pulses = [54508, 54512, ]
 
 #%%
 sig_generalQ1 = generate_sig_generalQi(1)
 fig, axes = scope(pulses, sig_generalQ1, do_smooth=False)
 #axes[-1].set_xlim(3.5, 6.5)
 axes[0].legend()
-
+#
 sig_generalQ2 = generate_sig_generalQi(2)
 fig, axes = scope(pulses, sig_generalQ2, do_smooth=False, window_loc=(600,0))
 #axes[-1].set_xlim(3.5, 6.5)
@@ -102,13 +102,13 @@ axes[0].legend()
 
 sig_capa_Q2 = generate_sig_capas_Qi(2)
 fig, axes = scope(pulses, sig_capa_Q2, do_smooth=False, window_loc=(600,0))
-axes[-1].set_xlim(3.5, 6.5)
+#axes[-1].set_xlim(3.5, 6.5)
 axes[0].legend()
 
-#sig_capa_Q4 = generate_sig_capas_Qi(4)
-#fig, axes = scope(pulses, sig_capa_Q4, do_smooth=False, window_loc=(1200,0))
+sig_capa_Q4 = generate_sig_capas_Qi(4)
+fig, axes = scope(pulses, sig_capa_Q4, do_smooth=False, window_loc=(1200,0))
 #axes[-1].set_xlim(0, 10)
-#axes[0].legend()
+axes[0].legend()
 
 
 #%% General view and Gaz

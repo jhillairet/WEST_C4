@@ -5,7 +5,10 @@ Created on Fri Jul 19 10:27:26 2019
 @author: JH218595
 """
 #%%
+import sys; sys.path.append('..')
+from control_room import *
 from numpy import *
+import matplotlib.pyplot as plt
 from matplotlib.pyplot import *
 from scipy.io import loadmat
 
@@ -39,7 +42,7 @@ fig.subplots_adjust(hspace=0)
 fig.savefig('WEST_54461-54462.png', dpi=150)
 
 #%%
-file_54445 = '../reflectometry/profiles/WEST_54461_prof.mat'
+file_54461 = '../reflectometry/profiles/WEST_54461_prof.mat'
 file_54462 = '../reflectometry/profiles/WEST_54462_prof.mat'
 
 data_54461 = loadmat(file_54461)
@@ -76,17 +79,52 @@ m2, s2, r2 = time_averaged_profile(data_54462, 2.5, 2.75)
 m4, s4, r4 = time_averaged_profile(data_54462, 3.5, 3.75)
 
 #%%
-t_start = 4
-t_stop = 4.25
-idx_t_start = argmin(abs(data['tX'] - t_start))
-idx_t_stop = argmin(abs(data['tX'] - t_end))
 fig, ax = plt.subplots()
+
+# Without Heating
+t_start = 2.5
+t_stop = 2.75
+idx_t_start = argmin(abs(data_54461['tX'] - t_start))
+idx_t_stop = argmin(abs(data_54461['tX'] - t_stop))
 
 for id in range(idx_t_start, idx_t_stop):
     ax.plot(data_54461['RX'][id,:], 
             data_54461['NEX'][id,:], 
-            label='54461 (4s)- LH (300 kW) and IC  (1.5MW) ', 
-            lw=2, alpha=.1, color="C0")
+            label='54461 - no heating', 
+            lw=2, alpha=.2, color="C0")
+
+# IC and LH
+t_start = 3.5
+t_stop = 3.75
+idx_t_start = argmin(abs(data_54461['tX'] - t_start))
+idx_t_stop = argmin(abs(data_54461['tX'] - t_stop))
+
+for id in range(idx_t_start, idx_t_stop):
+    ax.plot(data_54461['RX'][id,:], 
+            data_54461['NEX'][id,:], 
+            label='54461 - IC and LH', 
+            lw=2, alpha=.2, color="C1")
+
+# LH only
+t_start = 3.5
+t_stop = 3.75
+idx_t_start = argmin(abs(data_54462['tX'] - t_start))
+idx_t_stop = argmin(abs(data_54462['tX'] - t_stop))
+
+for id in range(idx_t_start, idx_t_stop):
+    ax.plot(data_54462['RX'][id,:], 
+            data_54462['NEX'][id,:], 
+            label='54462 - LH only', 
+            lw=2, alpha=.2, color="C2")
+    
+ax.set_yscale('log')
+ax.set_xlim((2.96, 3.02))
+ax.grid(True)
+ax.grid(True, which='minor', alpha=0.5)
+ax.axvline(3.011, color='k')
+ax.set_ylabel('Density [$m^{-3}$]', fontsize=12)
+ax.set_xlabel('Radius [m]', fontsize=12)
+
 #%%
 r_min, ne_min, r_max, ne_max = time_averaged_profile2(data_54461, 4.0, 4.25)
 
