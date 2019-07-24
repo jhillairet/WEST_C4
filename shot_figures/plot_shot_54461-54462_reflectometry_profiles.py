@@ -17,7 +17,11 @@ P_IC_54461, t_P_IC_54461 = get_sig(54461, signals['IC_P_tot'])
 P_LH_54461, t_P_LH_54461 = get_sig(54461, signals['LH_P_tot'])
 P_IC_54462, t_P_IC_54462 = get_sig(54462, signals['IC_P_tot'])
 P_LH_54462, t_P_LH_54462 = get_sig(54462, signals['LH_P_tot'])
-
+#%%
+t_start_wo = 5.0
+t_stop_wo = 5.1
+t_start = 3.25
+t_stop = 4.1
 
 #%%
 fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
@@ -29,13 +33,13 @@ ax2.plot(t_P_IC_54462, P_IC_54462, lw=2, label='54462')
 
 ax2.set_xlabel('t [s]', fontsize=14)
 ax2.set_xlim(2.4, 4.6)
-ax1.set_title(f'WEST 54461-54462')
+ax1.set_title(f'WEST #54461-#54462')
 [a.set_ylabel('Power [kW]', fontsize=14) for a in (ax1, ax2)]
 [a.grid(True, alpha=.4) for a in (ax1, ax2)]
 [a.tick_params(labelsize=12) for a in (ax1, ax2)]
 
-[a.axvspan(2.5, 2.75, color='grey', alpha=.2) for a in (ax1, ax2)]
-[a.axvspan(3.5, 3.75, color='grey', alpha=.2) for a in (ax1, ax2)]
+[a.axvspan(t_start_wo, t_stop_wo, color='grey', alpha=.2) for a in (ax1, ax2)]
+[a.axvspan(t_start, t_stop, color='grey', alpha=.2) for a in (ax1, ax2)]
 
 fig.subplots_adjust(hspace=0)
 #%%
@@ -48,44 +52,56 @@ file_54462 = '../reflectometry/profiles/WEST_54462_prof.mat'
 data_54461 = loadmat(file_54461)
 data_54462 = loadmat(file_54462)
 
-
 #%%
 def time_averaged_profile(data, t_start, t_end):
     idx_t_start = argmin(abs(data['tX'] - t_start))
     idx_t_stop = argmin(abs(data['tX'] - t_end))
     
-    m = mean(data['NEX'][idx_t_start:idx_t_stop,:], axis=0)
-    s = std(data['NEX'][idx_t_start:idx_t_stop,:], axis=0)
-    r = mean(data['RX'][idx_t_start:idx_t_stop,:], axis=0)
-    return m, s, r
+    ne_mean = mean(data['NEX'][idx_t_start:idx_t_stop,:], axis=0)
+    ne_std = std(data['NEX'][idx_t_start:idx_t_stop,:], axis=0)
+    r_mean = mean(data['RX'][idx_t_start:idx_t_stop,:], axis=0)
+    r_std = std(data['RX'][idx_t_start:idx_t_stop,:], axis=0)
 
-#%%
-def time_averaged_profile2(data, t_start, t_end):
-    idx_t_start = argmin(abs(data['tX'] - t_start))
-    idx_t_stop = argmin(abs(data['tX'] - t_end))
-    
-    ne_min = amin(data['NEX'][idx_t_start:idx_t_stop,:], axis=0)
-    ne_max = amax(data['NEX'][idx_t_start:idx_t_stop,:], axis=0)
-    r_min = amin(data['RX'][idx_t_start:idx_t_stop,:], axis=0)
-    r_max = amin(data['RX'][idx_t_start:idx_t_stop,:], axis=0)
+    return r_mean, r_std, ne_mean, ne_std
 
-    return r_min, ne_min, r_max, ne_max
+#%% ne and r mean, error bar repr with std
+r1, rs1, ne1, nes1 = time_averaged_profile(data_54461, t_start_wo, t_stop_wo)
+r2, rs2, ne2, nes2 = time_averaged_profile(data_54461, t_start, t_stop)
 
-#%%
-m1, s1, r1 = time_averaged_profile(data_54461, 2.5, 2.75)
-m3, s3, r3 = time_averaged_profile(data_54461, 3.5, 3.75)
+r3, rs3, ne3, nes3 = time_averaged_profile(data_54462, t_start_wo, t_stop_wo)
+r4, rs4, ne4, nes4 = time_averaged_profile(data_54462, t_start, t_stop)
 
-m2, s2, r2 = time_averaged_profile(data_54462, 2.5, 2.75)
-m4, s4, r4 = time_averaged_profile(data_54462, 3.5, 3.75)
+# %%
+fig, ax = plt.subplots()
 
-#%%
+ax.fill_betweenx(ne1, r1-rs1, r1+rs1, alpha=.4)
+ax.plot(r1, ne1, lw=2, label='#54461 - no heating')
+ax.fill_betweenx(ne3, r3-rs3, r3+rs3, alpha=.4)
+ax.plot(r3, ne3, lw=2, label='#54462 - no heating')
+        
+ax.fill_betweenx(ne2, r2-rs2, r2+rs2, alpha=.4)
+ax.plot(r2, ne2, lw=2, label='#54461 - LH and IC')
+ax.fill_betweenx(ne4, r4-rs4, r4+rs4, alpha=.4)
+ax.plot(r4, ne4, lw=2, label='#54462 - LH only')
+
+ax.legend()
+ax.set_yscale('log')
+ax.set_xlim((2.96, 3.02))
+ax.grid(True)
+ax.grid(True, which='minor', alpha=0.5)
+ax.axvline(3.011, color='k')
+ax.axvline(3.014, color='grey')
+ax.axvline(3.016, color='darkgrey')
+ax.set_ylabel('Density [$m^{-3}$]', fontsize=12)
+ax.set_xlabel('Radius [m]', fontsize=12)
+
+
+#%% superpose all traces
 fig, ax = plt.subplots()
 
 # Without Heating
-t_start = 2.5
-t_stop = 2.75
-idx_t_start = argmin(abs(data_54461['tX'] - t_start))
-idx_t_stop = argmin(abs(data_54461['tX'] - t_stop))
+idx_t_start = argmin(abs(data_54461['tX'] - t_start_wo))
+idx_t_stop = argmin(abs(data_54461['tX'] - t_stop_wo))
 
 for id in range(idx_t_start, idx_t_stop):
     ax.plot(data_54461['RX'][id,:], 
@@ -94,8 +110,6 @@ for id in range(idx_t_start, idx_t_stop):
             lw=2, alpha=.2, color="C0")
 
 # IC and LH
-t_start = 3.5
-t_stop = 3.75
 idx_t_start = argmin(abs(data_54461['tX'] - t_start))
 idx_t_stop = argmin(abs(data_54461['tX'] - t_stop))
 
@@ -106,8 +120,6 @@ for id in range(idx_t_start, idx_t_stop):
             lw=2, alpha=.2, color="C1")
 
 # LH only
-t_start = 3.5
-t_stop = 3.75
 idx_t_start = argmin(abs(data_54462['tX'] - t_start))
 idx_t_stop = argmin(abs(data_54462['tX'] - t_stop))
 
@@ -119,13 +131,14 @@ for id in range(idx_t_start, idx_t_stop):
     
 ax.set_yscale('log')
 ax.set_xlim((2.96, 3.02))
+ax.set_ylim(1e17, 4e19)
 ax.grid(True)
 ax.grid(True, which='minor', alpha=0.5)
 ax.axvline(3.011, color='k')
 ax.set_ylabel('Density [$m^{-3}$]', fontsize=12)
 ax.set_xlabel('Radius [m]', fontsize=12)
 
-#%%
+µ#%%
 r_min, ne_min, r_max, ne_max = time_averaged_profile2(data_54461, 4.0, 4.25)
 
 ax.fill(np.append(r_min, r_max[::-1]), 

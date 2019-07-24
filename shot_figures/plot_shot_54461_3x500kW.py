@@ -16,6 +16,7 @@ from matplotlib.pyplot import *
 #%%
 pulse = 54461
 
+#%% All three IC powers
 P_tot, t_tot = get_sig(pulse, signals['IC_P_tot'])
 P_Q1, t_Q1 = get_sig(pulse, signals['IC_P_Q1'])
 P_Q2, t_Q2 = get_sig(pulse, signals['IC_P_Q2'])
@@ -58,14 +59,14 @@ fig.tight_layout()
 fig.savefig('WEST_IC_54461_Power_Rc.png', dpi=150)
 
 
-#%%
+#%% Voltages and currents with limits
 V_left_max_Q2, t_V_left_max_Q2 = get_sig(pulse, signals['IC_Voltage_left_max_Q2'])
 V_right_max_Q2, t_V_right_max_Q2 = get_sig(pulse, signals['IC_Voltage_right_max_Q2'])
 
 I_left_max_Q2, t_I_left_max_Q2 = get_sig(pulse, signals['IC_Current_left_max_Q2'])
 I_right_max_Q2, t_I_right_max_Q2 = get_sig(pulse, signals['IC_Current_right_max_Q2'])
 
-#%%
+#%% 
 fig, ax = subplots(2,1,sharex=True)
 ax[0].plot(t_V_left_max_Q2, V_left_max_Q2, label='Q2 Left')
 ax[0].plot(t_V_right_max_Q2, V_right_max_Q2, label='Q2 Right')
@@ -92,3 +93,19 @@ fig.tight_layout()
 #%%
 fig.savefig('WEST_IC_54461_VI.png', dpi=150)
 
+#%% Total IC power vs LH
+pulses = [54461, 54462]
+
+sigs = [signals['LH_P_tot'],
+        signals['IC_P_tot']
+        ]
+
+fig, axes = scope(pulses, sigs)
+[a.tick_params(labelsize=12) for a in axes]
+
+axes[-1].set_xlim(2.6, 4.3)
+
+[a.xaxis.label.set_fontsize(14) for a in axes]
+[a.yaxis.label.set_fontsize(14) for a in axes] 
+#%%
+fig.savefig('WEST_'+'_'.join(str(pulse) for pulse in pulses)+'_LH_vs_IC.png', dpi=150)
