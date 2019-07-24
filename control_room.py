@@ -20,6 +20,8 @@ signals = {
     'LPA': {'name': 'GMAG_POSLPA%1', 'unit': 'm', 'label': 'LPA'},
     ## Fueling
     'nl': {'name': 'GINTLIDRT%3', 'unit': '$m^{-2}$', 'label': 'Line integrated density'},
+    'Valve1': {'name': 'GDEBIT%1', 'unit': '$Pa.m^3/s$', 'label': 'Valve#1 (LH1)'},
+    'Valve2': {'name': 'GDEBIT%2', 'unit': '$Pa.m^3/s$', 'label': 'Valve#2 (LH2)'},
     'Valve7': {'name': 'GDEBIT%7', 'unit': '$Pa.m^3/s$', 'label': 'Valve#7 (LPA)'},
     'Valve8': {'name': 'GDEBIT%8', 'unit': '$Pa.m^3/s$', 'label': 'Valve#8 (Q4)'},
     'Valve9': {'name': 'GDEBIT%9', 'unit': '$Pa.m^3/s$', 'label': 'Valve#9 (Q1)'},
@@ -559,7 +561,7 @@ def scope(pulses, signames, do_smooth=False, style_label='default', window_loc=(
     
             for (sigs, ax) in zip(signames, axes):
                 _legend = ''
-                _lines = cycle(['-',':', '--', '-x'])
+                _lines = cycle(['-',':', '--', '-.'])
                 # if a list: superpose the trace on the same axe
                 if not isinstance(sigs, list):
                     sigs = [sigs]
