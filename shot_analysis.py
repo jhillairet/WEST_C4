@@ -58,14 +58,14 @@ def generate_sig_capas_Qi(i=1):
 pulses = [54449, 54453]
 pulses = [54461, 54462]
 pulses = [54461, 54462]
-pulses = [54508, 54512, ]
+pulses = [54546]
 
 #%%
 sig_generalQ1 = generate_sig_generalQi(1)
 fig, axes = scope(pulses, sig_generalQ1, do_smooth=False)
 #axes[-1].set_xlim(3.5, 6.5)
 axes[0].legend()
-#
+
 sig_generalQ2 = generate_sig_generalQi(2)
 fig, axes = scope(pulses, sig_generalQ2, do_smooth=False, window_loc=(600,0))
 #axes[-1].set_xlim(3.5, 6.5)
@@ -116,11 +116,12 @@ sig_general = [
         #4signals['Ip'],
         signals['nl'],
         #signals['Rext_median'],
-        signals['IC_P_tot'],#[signals['LH_P_LH1'], signals['LH_P_LH2']],
+        #signals['IC_P_tot'],#[signals['LH_P_LH1'], signals['LH_P_LH2']],
         signals['LH_P_tot'],
-        #[signals['IC_P_Q1'], signals['IC_P_Q2'], signals['IC_P_Q4']],
-        #[signals['IC_Rc_Q1_avg'], signals['IC_Rc_Q2_avg'], signals['IC_Rc_Q4_avg']],
-        #[signals['Valve9'], signals['Valve10'], signals['Valve8'], ],
+        [signals['IC_P_Q1'], signals['IC_P_Q4']],
+        [signals['IC_Rc_Q1_left'], signals['IC_Rc_Q1_right']],
+        [signals['IC_Rc_Q4_left'], signals['IC_Rc_Q4_right']],
+        [signals['Valve1'], signals['Valve2'], signals['Valve9'], signals['Valve10'],  signals['Valve11'], ],
         #[signals[f'IC_Vacuum_Q1_right'], signals[f'IC_Vacuum_Q2_right'], signals[f'IC_Vacuum_Q4_right'] ],
         ]
 fig, axes = scope(pulses, sig_general, do_smooth=False, window_loc=(600,0))
