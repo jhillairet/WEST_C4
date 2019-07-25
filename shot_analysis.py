@@ -21,6 +21,7 @@ def generate_sig_generalQi(i=1):
         [signals[f'IC_Rc_Q{i}_left'], signals[f'IC_Rc_Q{i}_right']],
     [signals[f'IC_Voltage_left_upper_Q{i}'], signals[f'IC_Voltage_left_lower_Q{i}']],
     [signals[f'IC_Voltage_right_upper_Q{i}'], signals[f'IC_Voltage_right_lower_Q{i}']],
+    #[signals['IC_Phase_Q1 (Pf_Left - Pf_Right)']],
     [signals[f'IC_delta_phi_toro_Q{i}_Bot_LmR'], signals[f'IC_delta_phi_toro_Q{i}_Top_LmR']],        
         [signals[f'IC_Vacuum_Q{i}_right'], signals[f'IC_Vacuum_Q{i}_left']],
         
@@ -57,19 +58,18 @@ def generate_sig_capas_Qi(i=1):
 #%%
 pulses = [54449, 54453]
 pulses = [54461, 54462]
-pulses = [54461, 54462]
-pulses = [54546]
-
+pulses = [54537, 54544, 54545]
+pulses = [54575]
 #%%
 sig_generalQ1 = generate_sig_generalQi(1)
 fig, axes = scope(pulses, sig_generalQ1, do_smooth=False)
 #axes[-1].set_xlim(3.5, 6.5)
 axes[0].legend()
 
-sig_generalQ2 = generate_sig_generalQi(2)
-fig, axes = scope(pulses, sig_generalQ2, do_smooth=False, window_loc=(600,0))
-#axes[-1].set_xlim(3.5, 6.5)
-axes[0].legend()
+#sig_generalQ2 = generate_sig_generalQi(2)
+#fig, axes = scope(pulses, sig_generalQ2, do_smooth=False, window_loc=(600,0))
+##axes[-1].set_xlim(3.5, 6.5)
+#axes[0].legend()
 
 sig_generalQ4 = generate_sig_generalQi(4)
 fig, axes = scope(pulses, sig_generalQ4, do_smooth=False, window_loc=(1200,0))
@@ -97,7 +97,7 @@ axes[0].legend()
 #%% capacitors
 sig_capa_Q1 = generate_sig_capas_Qi(1)
 fig, axes = scope(pulses, sig_capa_Q1, do_smooth=False)
-axes[-1].set_xlim(3.5, 6.5)
+#axes[-1].set_xlim(3.5, 6.5)
 axes[0].legend()
 
 sig_capa_Q2 = generate_sig_capas_Qi(2)

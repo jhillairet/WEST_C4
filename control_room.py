@@ -39,6 +39,8 @@ signals = {
     'LH_Positions': {'name': None, 'fun': 'LH_Positions', 'unit': 'm', 'label': 'LH Antenna positions'},
     # IC antenna frequencies (use tsmat)
     'IC_Frequencies': {'name': None, 'fun': 'IC_Frequencies', 'unit': 'MHz', 'label': 'IC Antenna Frequencies'},
+    # FPGA temperatures
+    'IC_FPGA_Temperatures': {'name': None, 'fun': 'IC_FPGA_Temperatures', 'unit': 'degC', 'label': 'IC FPGA Card Temperatures'},
     # IC antennas left and right forward and reflected powers
     'IC_P_Q1_left_fwd': {'name': 'GICHANTPOWQ1%1', 'unit': 'kW', 'label': 'Left Fwd Power Q1'},
     'IC_P_Q1_left_ref': {'name': 'GICHANTPOWQ1%2', 'unit': 'kW', 'label': 'Left Ref Power Q1'},
@@ -198,7 +200,7 @@ signals = {
     'IC_Current_right_upper_Q4': {'name': 'GICHICAPA%11', 'unit': 'A', 'label': 'Right upper capacitor current Q4', 'options': {'ylimit':915}},
     'IC_Current_right_lower_Q4': {'name': 'GICHICAPA%12', 'unit': 'A', 'label': 'Right lower capacitor current Q4', 'options': {'ylimit':915}}, 
     # IC Errors
-
+    
     ## LHCD
     'LH_P_tot': {'name': 'SHYBPTOT', 'unit': 'MW', 'label': 'LH total coupled power'},
     'LH_P_LH1': {'name': 'SHYBPFORW1', 'unit': 'kW', 'label': 'LH1 coupled power'},
@@ -280,6 +282,10 @@ def LH_Positions(pulse):
 def IC_Frequencies(pulse):
     y = pw.tsmat(pulse, 'DFCI;PILOTAGE;ICHFREQ')
     return y, np.array([-1, -1, -1])
+
+def IC_FPGA_Temperatures(pulse):
+    y = pw.tsmat(pulse, 'DFCI;MONITORING;Temp')
+    return y, np.array([-1, -1, -1, -1, -1, -1])
 
 def IC_Errors(pulse):
     '''
@@ -381,7 +387,8 @@ phases ICRH
 """
 # TODO : passing argument to get_sig
 def delta_phi_toro_Q1_Top_LmR(pulse):
-    return delta_phi_toro_Qi_Top_LmR(pulse, i=1)
+    y = delta_phi_toro_Qi_Top_LmR(pulse, i=1)
+    return np.zeros_like(y) # mauvaise mesure --> 0
 def delta_phi_toro_Q2_Top_LmR(pulse):
     return delta_phi_toro_Qi_Top_LmR(pulse, i=2)
 def delta_phi_toro_Q4_Top_LmR(pulse):
