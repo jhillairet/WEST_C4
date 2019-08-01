@@ -10,20 +10,18 @@ import numpy as np
 def generate_sig_generalQi(i=1):
     sigs_general_Qi = [
         signals[f'IC_PCS_interdiction_Q{i}'],
-        signals[f'IC_PCS_Power_Q{i}'],
-                
+        signals[f'IC_PCS_Power_Q{i}'], 
+        #signals[f'IC_P_Q{i}'],
         [signals[f'IC_P_Q{i}_left_fwd'], signals[f'IC_P_Q{i}_left_ref']],
-    
         [signals[f'IC_P_Q{i}_right_fwd'], signals[f'IC_P_Q{i}_right_ref']],
-        
         [signals[f'IC_VSWR_Q{i}_Left'], signals[f'IC_VSWR_Q{i}_Right']],
-    
         [signals[f'IC_Rc_Q{i}_left'], signals[f'IC_Rc_Q{i}_right']],
-    [signals[f'IC_Voltage_left_upper_Q{i}'], signals[f'IC_Voltage_left_lower_Q{i}']],
-    [signals[f'IC_Voltage_right_upper_Q{i}'], signals[f'IC_Voltage_right_lower_Q{i}']],
-    [signals[f'IC_delta_phi_toro_Q{i}_Bot_LmR'], signals[f'IC_delta_phi_toro_Q{i}_Top_LmR']],        
+        [signals[f'IC_Voltage_left_upper_Q{i}'], signals[f'IC_Voltage_left_lower_Q{i}']],
+        [signals[f'IC_Voltage_right_upper_Q{i}'], signals[f'IC_Voltage_right_lower_Q{i}']],
+        #[signals['IC_Phase_Q1 (Pf_Left - Pf_Right)']],
+        signals[f'IC_delta_phi_toro_Q{i}_LmR_FPGA'], 
+        [signals[f'IC_delta_phi_toro_Q{i}_Bot_LmR'], signals[f'IC_delta_phi_toro_Q{i}_Top_LmR']],        
         [signals[f'IC_Vacuum_Q{i}_right'], signals[f'IC_Vacuum_Q{i}_left']],
-        
         [signals[f'IC_ErrSig_Q{i}_left_upper'], signals[f'IC_ErrSig_Q{i}_left_lower']],
         [signals[f'IC_ErrSig_Q{i}_right_upper'], signals[f'IC_ErrSig_Q{i}_right_lower']],
     ]
@@ -57,19 +55,20 @@ def generate_sig_capas_Qi(i=1):
 #%%
 pulses = [54449, 54453]
 pulses = [54461, 54462]
-pulses = [54461, 54462]
-pulses = [54508, 54512, ]
+pulses = [54537, 54544, 54545]
+pulses = [ 54635, 54637, 54638 ]
+pulses = [54588, 54589, 54590, 54591]
 
 #%%
 sig_generalQ1 = generate_sig_generalQi(1)
 fig, axes = scope(pulses, sig_generalQ1, do_smooth=False)
 #axes[-1].set_xlim(3.5, 6.5)
 axes[0].legend()
-#
-sig_generalQ2 = generate_sig_generalQi(2)
-fig, axes = scope(pulses, sig_generalQ2, do_smooth=False, window_loc=(600,0))
-#axes[-1].set_xlim(3.5, 6.5)
-axes[0].legend()
+
+#sig_generalQ2 = generate_sig_generalQi(2)
+#fig, axes = scope(pulses, sig_generalQ2, do_smooth=False, window_loc=(600,0))
+##axes[-1].set_xlim(3.5, 6.5)
+#axes[0].legend()
 
 sig_generalQ4 = generate_sig_generalQi(4)
 fig, axes = scope(pulses, sig_generalQ4, do_smooth=False, window_loc=(1200,0))
@@ -78,10 +77,10 @@ axes[0].legend()
 
 
 #%%
-sig_probes_Q1 = generate_sig_probes_Qi(1)
-fig, axes = scope(pulses, sig_probes_Q1, do_smooth=False)
-#axes[-1].set_xlim(3.5, 6.5)
-axes[0].legend()
+#sig_probes_Q1 = generate_sig_probes_Qi(1)
+#fig, axes = scope(pulses, sig_probes_Q1, do_smooth=False)
+##axes[-1].set_xlim(3.5, 6.5)
+#axes[0].legend()
 
 sig_probes_Q2 = generate_sig_probes_Qi(2)
 fig, axes = scope(pulses, sig_probes_Q2, do_smooth=False, window_loc=(600,0))
@@ -95,10 +94,10 @@ axes[0].legend()
 
 
 #%% capacitors
-sig_capa_Q1 = generate_sig_capas_Qi(1)
-fig, axes = scope(pulses, sig_capa_Q1, do_smooth=False)
-axes[-1].set_xlim(3.5, 6.5)
-axes[0].legend()
+#sig_capa_Q1 = generate_sig_capas_Qi(1)
+#fig, axes = scope(pulses, sig_capa_Q1, do_smooth=False)
+##axes[-1].set_xlim(3.5, 6.5)
+#axes[0].legend()
 
 sig_capa_Q2 = generate_sig_capas_Qi(2)
 fig, axes = scope(pulses, sig_capa_Q2, do_smooth=False, window_loc=(600,0))
@@ -112,18 +111,39 @@ axes[0].legend()
 
 
 #%% General view and Gaz
+
 sig_general = [
         #4signals['Ip'],
         signals['nl'],
-        #signals['Rext_median'],
-        signals['IC_P_tot'],#[signals['LH_P_LH1'], signals['LH_P_LH2']],
+        signals['Rext_median'],
+        #signals['IC_P_tot'],#[signals['LH_P_LH1'], signals['LH_P_LH2']],
         signals['LH_P_tot'],
-        #[signals['IC_P_Q1'], signals['IC_P_Q2'], signals['IC_P_Q4']],
-        #[signals['IC_Rc_Q1_avg'], signals['IC_Rc_Q2_avg'], signals['IC_Rc_Q4_avg']],
-        #[signals['Valve9'], signals['Valve10'], signals['Valve8'], ],
+        #signals['IC_P_tot'],
+        [signals['IC_P_Q1'], signals['IC_P_Q2'], signals['IC_P_Q4']],
+        [signals['IC_Rc_Q1_left'], signals['IC_Rc_Q2_left'], signals['IC_Rc_Q1_left']],
+        [signals['IC_Rc_Q4_right'], signals['IC_Rc_Q2_right'], signals['IC_Rc_Q4_right']],
+        [signals['Valve1'], signals['Valve2'], signals['Valve9'], signals['Valve10'],  signals['Valve11'], ],
         #[signals[f'IC_Vacuum_Q1_right'], signals[f'IC_Vacuum_Q2_right'], signals[f'IC_Vacuum_Q4_right'] ],
+        signals['Cu'],
         ]
 fig, axes = scope(pulses, sig_general, do_smooth=False, window_loc=(600,0))
+#axes[-1].set_xlim(3.5, 6.5)
+axes[0].legend()
+
+
+#%% Phase differences
+pulses = [87]
+
+
+sig_phases = [
+        [signals['IC_delta_phi_toro_Q1_Top_LmR'], signals['IC_delta_phi_toro_Q1_Bot_LmR']],
+        signals['IC_delta_phi_toro_Q1_LmR_FPGA'],
+        [signals['IC_delta_phi_toro_Q2_Top_LmR'], signals['IC_delta_phi_toro_Q2_Bot_LmR']],
+        signals['IC_delta_phi_toro_Q2_LmR_FPGA'],
+        [signals['IC_delta_phi_toro_Q4_Top_LmR'], signals['IC_delta_phi_toro_Q4_Bot_LmR']],
+        signals['IC_delta_phi_toro_Q4_LmR_FPGA'],
+        ]
+fig, axes = scope(pulses, sig_phases, do_smooth=False, window_loc=(600,0))
 #axes[-1].set_xlim(3.5, 6.5)
 axes[0].legend()
 

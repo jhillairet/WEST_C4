@@ -16,10 +16,13 @@ signals = {
     'Rext_lower': {'name': 'GMAG_TEST%2', 'unit': 'm', 'label': 'Rext lower'},  # Rext lower
     'Zgeo': {'name': 'GMAG_BARY%2', 'unit': 'm', 'label': 'Zgeo'},  # Zgeo barycentre
     'R0': {'name': 'GMAG_BARY%1', 'unit': 'm', 'label': 'Large radius'},  # grand rayon
+    'Ignitron': {'name' : None, 'fun': 'tignitron', 'unit': 's', 'label': 'Ignitron Time'},
     # Movable limiter position (LPA)
     'LPA': {'name': 'GMAG_POSLPA%1', 'unit': 'm', 'label': 'LPA'},
     ## Fueling
     'nl': {'name': 'GINTLIDRT%3', 'unit': '$m^{-2}$', 'label': 'Line integrated density'},
+    'Valve1': {'name': 'GDEBIT%1', 'unit': '$Pa.m^3/s$', 'label': 'Valve#1 (LH1)'},
+    'Valve2': {'name': 'GDEBIT%2', 'unit': '$Pa.m^3/s$', 'label': 'Valve#2 (LH2)'},
     'Valve7': {'name': 'GDEBIT%7', 'unit': '$Pa.m^3/s$', 'label': 'Valve#7 (LPA)'},
     'Valve8': {'name': 'GDEBIT%8', 'unit': '$Pa.m^3/s$', 'label': 'Valve#8 (Q4)'},
     'Valve9': {'name': 'GDEBIT%9', 'unit': '$Pa.m^3/s$', 'label': 'Valve#9 (Q1)'},
@@ -37,6 +40,8 @@ signals = {
     'LH_Positions': {'name': None, 'fun': 'LH_Positions', 'unit': 'm', 'label': 'LH Antenna positions'},
     # IC antenna frequencies (use tsmat)
     'IC_Frequencies': {'name': None, 'fun': 'IC_Frequencies', 'unit': 'MHz', 'label': 'IC Antenna Frequencies'},
+    # FPGA temperatures
+    'IC_FPGA_Temperatures': {'name': None, 'fun': 'IC_FPGA_Temperatures', 'unit': 'degC', 'label': 'IC FPGA Card Temperatures'},
     # IC antennas left and right forward and reflected powers
     'IC_P_Q1_left_fwd': {'name': 'GICHANTPOWQ1%1', 'unit': 'kW', 'label': 'Left Fwd Power Q1'},
     'IC_P_Q1_left_ref': {'name': 'GICHANTPOWQ1%2', 'unit': 'kW', 'label': 'Left Ref Power Q1'},
@@ -50,8 +55,6 @@ signals = {
     'IC_P_Q4_left_ref': {'name': 'GICHANTPOWQ4%2', 'unit': 'kW', 'label': 'Left Ref Power Q4'},
     'IC_P_Q4_right_fwd': {'name': 'GICHANTPOWQ4%3', 'unit': 'kW', 'label': 'Right Fwd Power Q4'},
     'IC_P_Q4_right_ref': {'name': 'GICHANTPOWQ4%4', 'unit': 'kW', 'label': 'Right Ref Power Q4'},
-    # IC coupled power per side
-    ''
     # IC Antennas coupling resistances
     'IC_Rc_Q1_left': {'name': 'GICHCOUPRES%1', 'unit': 'Ohm', 'label': 'Rc - Q1 Left', 'options':{'ylim':(0,1.5)} },
     'IC_Rc_Q1_right': {'name': 'GICHCOUPRES%2', 'unit': 'Ohm', 'label': 'Rc - Q1 Right', 'options':{'ylim':(0,1.5)}},
@@ -107,13 +110,17 @@ signals = {
     'IC_delta_phi_polo_Q1_Right_BmT': {'name':None, 'fun': 'delta_phi_polo_Q1_Right_BmT', 'unit': 'deg', 'label': 'DeltaPhase Q1 (B - T) Right'},
     'IC_delta_phi_polo_Q2_Right_BmT': {'name':None, 'fun': 'delta_phi_polo_Q2_Right_BmT', 'unit': 'deg', 'label': 'DeltaPhase Q2 (B - T) Right'},
     'IC_delta_phi_polo_Q4_Right_BmT': {'name':None, 'fun': 'delta_phi_polo_Q4_Right_BmT', 'unit': 'deg', 'label': 'DeltaPhase Q4 (B - T) Right'},    
+    # IC antenna phase differences calculated in FPGA direclty. Default is difference between top straps except Q1 -> bottom as V1 out of order
+    'IC_delta_phi_toro_Q1_LmR_FPGA': {'name': 'SICHPHQ1', 'unit': 'deg', 'label':' DeltaPhase Q1 (L - R) Bot FPGA'},
+    'IC_delta_phi_toro_Q2_LmR_FPGA': {'name': 'SICHPHQ2', 'unit': 'deg', 'label':' DeltaPhase Q2 (L - R) Bot FPGA'},
+    'IC_delta_phi_toro_Q4_LmR_FPGA': {'name': 'SICHPHQ4', 'unit': 'deg', 'label':' DeltaPhase Q4 (L - R) Bot FPGA'},
     # IC Antennas internal vacuum (y = 10**(1.5*y - 10))
-    'IC_Vacuum_Q1_left': {'name': None, 'fun': 'IC_Q1_vacuum_left', 'unit': 'Pa', 'label': 'Vaccum Q1 left', 'options': {'yscale':'log', 'ylimit':4.5e-3, 'ylimit_low':9.5e-5}},
-    'IC_Vacuum_Q1_right': {'name': None, 'fun': 'IC_Q1_vacuum_right', 'unit': 'Pa', 'label': 'Vaccum Q1 right', 'options': {'yscale':'log', 'ylimit':4.5e-3, 'ylimit_low':9.5e-5}},
-    'IC_Vacuum_Q2_left': {'name': None, 'fun': 'IC_Q2_vacuum_right', 'unit': 'Pa', 'label': 'Vaccum Q2 left', 'options': {'yscale':'log', 'ylimit':4.5e-3, 'ylimit_low':9.5e-5}},
-    'IC_Vacuum_Q2_right': {'name': None, 'fun': 'IC_Q2_vacuum_right', 'unit': 'Pa', 'label': 'Vaccum Q2 right', 'options': {'yscale':'log', 'ylimit':4.5e-3, 'ylimit_low':9.5e-5}},
-    'IC_Vacuum_Q4_left': {'name': None, 'fun': 'IC_Q4_vacuum_right', 'unit': 'Pa', 'label': 'Vaccum Q4 left', 'options': {'yscale':'log', 'ylimit':4.5e-3, 'ylimit_low':9.5e-5}},
-    'IC_Vacuum_Q4_right': {'name': None, 'fun': 'IC_Q4_vacuum_right', 'unit': 'Pa', 'label': 'Vaccum Q4 right', 'options': {'yscale':'log', 'ylimit':4.5e-3, 'ylimit_low':9.5e-5}},
+    'IC_Vacuum_Q1_left': {'name': None, 'fun': 'IC_Q1_vacuum_left', 'unit': 'Pa', 'label': 'Vaccum Q1 left', 'options': {'yscale':'log', 'ylimit':4.5e-3, 'ylimit_low':2.2e-4}},
+    'IC_Vacuum_Q1_right': {'name': None, 'fun': 'IC_Q1_vacuum_right', 'unit': 'Pa', 'label': 'Vaccum Q1 right', 'options': {'yscale':'log', 'ylimit':4.5e-3, 'ylimit_low':2.2e-4}},
+    'IC_Vacuum_Q2_left': {'name': None, 'fun': 'IC_Q2_vacuum_right', 'unit': 'Pa', 'label': 'Vaccum Q2 left', 'options': {'yscale':'log', 'ylimit':4.5e-3, 'ylimit_low':2.2e-4}},
+    'IC_Vacuum_Q2_right': {'name': None, 'fun': 'IC_Q2_vacuum_right', 'unit': 'Pa', 'label': 'Vaccum Q2 right', 'options': {'yscale':'log', 'ylimit':4.5e-3, 'ylimit_low':2.2e-4}},
+    'IC_Vacuum_Q4_left': {'name': None, 'fun': 'IC_Q4_vacuum_right', 'unit': 'Pa', 'label': 'Vaccum Q4 left', 'options': {'yscale':'log', 'ylimit':4.5e-3, 'ylimit_low':2.2e-4}},
+    'IC_Vacuum_Q4_right': {'name': None, 'fun': 'IC_Q4_vacuum_right', 'unit': 'Pa', 'label': 'Vaccum Q4 right', 'options': {'yscale':'log', 'ylimit':4.5e-3, 'ylimit_low':2.2e-4}},
     # Acquisition des Consignes de puissance en sortie des FPGA 
     'IC_cons_Power_Q1': {'name': 'GICHSPP%1', 'unit': 'kW', 'label': 'Acquisition consigne generee Q1'},
     'IC_cons_Power_Q2': {'name': 'GICHSPP%2', 'unit': 'kW', 'label': 'Acquisition consigne generee Q1'},
@@ -196,7 +203,7 @@ signals = {
     'IC_Current_right_upper_Q4': {'name': 'GICHICAPA%11', 'unit': 'A', 'label': 'Right upper capacitor current Q4', 'options': {'ylimit':915}},
     'IC_Current_right_lower_Q4': {'name': 'GICHICAPA%12', 'unit': 'A', 'label': 'Right lower capacitor current Q4', 'options': {'ylimit':915}}, 
     # IC Errors
-
+    
     ## LHCD
     'LH_P_tot': {'name': 'SHYBPTOT', 'unit': 'MW', 'label': 'LH total coupled power'},
     'LH_P_LH1': {'name': 'SHYBPFORW1', 'unit': 'kW', 'label': 'LH1 coupled power'},
@@ -278,6 +285,14 @@ def LH_Positions(pulse):
 def IC_Frequencies(pulse):
     y = pw.tsmat(pulse, 'DFCI;PILOTAGE;ICHFREQ')
     return y, np.array([-1, -1, -1])
+
+def IC_FPGA_Temperatures(pulse):
+    y = pw.tsmat(pulse, 'DFCI;MONITORING;Temp')
+    return y, np.array([-1, -1, -1, -1, -1, -1])
+
+def tignitron(pulse):
+    t = pw.tsmat(pulse, 'IGNITRON|1')
+    return t, -1
 
 def IC_Errors(pulse):
     '''
@@ -379,7 +394,8 @@ phases ICRH
 """
 # TODO : passing argument to get_sig
 def delta_phi_toro_Q1_Top_LmR(pulse):
-    return delta_phi_toro_Qi_Top_LmR(pulse, i=1)
+    y = delta_phi_toro_Qi_Top_LmR(pulse, i=1)
+    return np.zeros_like(y) # mauvaise mesure --> 0
 def delta_phi_toro_Q2_Top_LmR(pulse):
     return delta_phi_toro_Qi_Top_LmR(pulse, i=2)
 def delta_phi_toro_Q4_Top_LmR(pulse):
@@ -409,13 +425,13 @@ def delta_phi_polo_Q4_Right_BmT(pulse):
 # Q1
 def delta_phi_toro_Qi_Top_LmR(pulse, i=1):
     PhasesQi, tPhasesQi = pw.tsbase(pulse, f'GICHPHASESQ{i}', nargout=2)
-    dPhiToroTOP_LmR = PhasesQi[:,3] + PhasesQi[:,1] - PhasesQi[:,5]
-    return  dPhiToroTOP_LmR, tPhasesQi[:,0]
+    dPhiToroTOP_LmR = PhasesQi[:,3] + PhasesQi[:,0] - PhasesQi[:,5]
+    return  dPhiToroTOP_LmR % 360, tPhasesQi[:,0]
 
 def delta_phi_toro_Qi_Bot_LmR(pulse, i=1):
     PhasesQi, tPhasesQi = pw.tsbase(pulse, f'GICHPHASESQ{i}', nargout=2)
     dPhiToroBOT_LmR = PhasesQi[:,4] + PhasesQi[:,0] - PhasesQi[:,6]
-    return  dPhiToroBOT_LmR, tPhasesQi[:,0]
+    return  dPhiToroBOT_LmR % 360, tPhasesQi[:,0]
 
 def delta_phi_polo_Qi_Left_BmT(pulse, i=1):
     PhasesQi, tPhasesQi = pw.tsbase(pulse, f'GICHPHASESQ{i}', nargout=2)
@@ -559,7 +575,7 @@ def scope(pulses, signames, do_smooth=False, style_label='default', window_loc=(
     
             for (sigs, ax) in zip(signames, axes):
                 _legend = ''
-                _lines = cycle(['-',':', '--', '-x'])
+                _lines = cycle(['-',':', '--', '-.'])
                 # if a list: superpose the trace on the same axe
                 if not isinstance(sigs, list):
                     sigs = [sigs]
@@ -582,6 +598,8 @@ def scope(pulses, signames, do_smooth=False, style_label='default', window_loc=(
                         ax.set_ylim(bottom=sig['options']['ymin'])
                     if 'ylimit' in sig['options']:
                         ax.axhline(sig['options']['ylimit'], color='r')
+                    if 'ylimit_low' in sig['options']:
+                        ax.axhline(sig['options']['ylimit_low'], color='g', ls='--')
 
         # time axis
         axes[-1].set_xlabel('t [s]')
