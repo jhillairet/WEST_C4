@@ -67,12 +67,12 @@ signals = {
     'IC_Rc_Q4_avg': {'name': None, 'fun': 'IC_Rc_Q4_avg', 'unit': 'Ohm', 'label': 'Avg. Rc - Q4', 'options':{'ylim':(0,1.5)}},    
     'IC_Rc_avg': {'name': None, 'fun': 'IC_Rc_avg', 'unit': 'Ohm', 'label': 'Avg. IC Rc', 'options':{'ylim':(0,1.5)}},
     # IC VSWR
-    'IC_VSWR_Q1_Left': {'name':None, 'fun':'VSWR_Q1_Left', 'unit': '', 'label':'VSWR Q1 Left', 'options':{'ymin':0}},
-    'IC_VSWR_Q1_Right': {'name':None, 'fun':'VSWR_Q1_Right', 'unit': '', 'label':'VSWR Q1 Right', 'options':{'ymin':0}},
-    'IC_VSWR_Q2_Left': {'name':None, 'fun':'VSWR_Q2_Left', 'unit': '', 'label':'VSWR Q2 Left', 'options':{'ymin':0}},
-    'IC_VSWR_Q2_Right': {'name':None, 'fun':'VSWR_Q2_Right', 'unit': '', 'label':'VSWR Q2 Right', 'options':{'ymin':0}},
-    'IC_VSWR_Q4_Left': {'name':None, 'fun':'VSWR_Q4_Left', 'unit': '', 'label':'VSWR Q4 Left', 'options':{'ymin':0}},
-    'IC_VSWR_Q4_Right': {'name':None, 'fun':'VSWR_Q4_Right', 'unit': '', 'label':'VSWR Q4 Right', 'options':{'ymin':0}},    
+    'IC_VSWR_Q1_Left': {'name':None, 'fun':'VSWR_Q1_Left', 'unit': '', 'label':'VSWR Q1 Left', 'options':{'ylim':(1, 3)}},
+    'IC_VSWR_Q1_Right': {'name':None, 'fun':'VSWR_Q1_Right', 'unit': '', 'label':'VSWR Q1 Right', 'options':{'ylim':(1, 3)}},
+    'IC_VSWR_Q2_Left': {'name':None, 'fun':'VSWR_Q2_Left', 'unit': '', 'label':'VSWR Q2 Left', 'options':{'ylim':(1, 3)}},
+    'IC_VSWR_Q2_Right': {'name':None, 'fun':'VSWR_Q2_Right', 'unit': '', 'label':'VSWR Q2 Right', 'options':{'ylim':(1, 3)}},
+    'IC_VSWR_Q4_Left': {'name':None, 'fun':'VSWR_Q4_Left', 'unit': '', 'label':'VSWR Q4 Left', 'options':{'ylim':(1, 3)}},
+    'IC_VSWR_Q4_Right': {'name':None, 'fun':'VSWR_Q4_Right', 'unit': '', 'label':'VSWR Q4 Right', 'options':{'ylim':(1, 3)}},    
     # IC antennas phase Q1
     'IC_Phase_Q1 (Pf_Left - Pf_Right)': {'name': 'GICHPHASESQ1%1', 'unit': 'deg', 'label': 'Phase (Pf left - Pf right) antenna Q1'},
     'IC_Phase_Q1 (Pr_Left - Pf_Right)': {'name': 'GICHPHASESQ1%2', 'unit': 'deg', 'label': 'Phase (Pr left - Pf right) antenna Q1'},
@@ -172,7 +172,7 @@ signals = {
     'IC_Voltage_right_upper_Q2': {'name': 'GICHVPROBEQ2%3', 'unit': 'kV', 'label': 'Right upper capacitor voltage Q2', 'options': {'ylimit':27}},
     'IC_Voltage_right_lower_Q2': {'name': 'GICHVPROBEQ2%4', 'unit': 'kV', 'label': 'Right lower capacitor voltage Q2', 'options': {'ylimit':27}},
     'IC_Voltage_left_upper_Q4': {'name': 'GICHVPROBEQ4%1', 'unit': 'kV', 'label': 'Left upper capacitor voltage Q4', 'options': {'ylimit':27}},
-    'IC_Voltage_left_lower_Q4': {'name': 'GICHVPROBEQ4%2', 'unit': 'kV', 'label': 'Left lower capacitor voltage Q4'},
+    'IC_Voltage_left_lower_Q4': {'name': 'GICHVPROBEQ4%2', 'unit': 'kV', 'label': 'Left lower capacitor voltage Q4', 'options': {'ylimit':27}},
     'IC_Voltage_right_upper_Q4': {'name': 'GICHVPROBEQ4%3', 'unit': 'kV', 'label': 'Right upper capacitor voltage Q4', 'options': {'ylimit':27}},
     'IC_Voltage_right_lower_Q4': {'name': 'GICHVPROBEQ4%4', 'unit': 'kV', 'label': 'Right lower capacitor voltage Q4', 'options': {'ylimit':27}},
     # IC Maximum Voltage values
