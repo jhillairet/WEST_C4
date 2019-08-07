@@ -59,23 +59,23 @@ pulses = [54449, 54453]
 pulses = [54461, 54462]
 pulses = [54537, 54544, 54545]
 pulses = [54635, 54637, 54638 ]
-pulses = [54514, 54525]
+pulses = [54758]
 
 #%%
-#sig_generalQ1 = generate_sig_generalQi(1)
-#fig, axes = scope(pulses, sig_generalQ1, do_smooth=False)
-##axes[-1].set_xlim(3.5, 6.5)
-#axes[0].legend()
+sig_generalQ1 = generate_sig_generalQi(1)
+fig, axes = scope(pulses, sig_generalQ1, do_smooth=False)
+#axes[-1].set_xlim(3.5, 6.5)
+axes[0].legend()
 
 sig_generalQ2 = generate_sig_generalQi(2)
 fig, axes = scope(pulses, sig_generalQ2, do_smooth=False, window_loc=(600,0))
 #axes[-1].set_xlim(3.5, 6.5)
 axes[0].legend()
 
-#sig_generalQ4 = generate_sig_generalQi(4)
-#fig, axes = scope(pulses, sig_generalQ4, do_smooth=False, window_loc=(1200,0))
-##axes[-1].set_xlim(3.5, 6.5)
-#axes[0].legend()
+sig_generalQ4 = generate_sig_generalQi(4)
+fig, axes = scope(pulses, sig_generalQ4, do_smooth=False, window_loc=(1200,0))
+#axes[-1].set_xlim(3.5, 6.5)
+axes[0].legend()
 
 
 #%%
