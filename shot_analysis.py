@@ -12,6 +12,7 @@ def generate_sig_generalQi(i=1):
         signals[f'IC_PCS_interdiction_Q{i}'],
         signals[f'IC_PCS_Power_Q{i}'], 
         #signals[f'IC_P_Q{i}'],
+        signals['IC_P_tot'],
         [signals[f'IC_P_Q{i}_left_fwd'], signals[f'IC_P_Q{i}_left_ref']],
         [signals[f'IC_P_Q{i}_right_fwd'], signals[f'IC_P_Q{i}_right_ref']],
         [signals[f'IC_VSWR_Q{i}_Left'], signals[f'IC_VSWR_Q{i}_Right']],
@@ -29,13 +30,22 @@ def generate_sig_generalQi(i=1):
     ]
     return sigs_general_Qi
 
+
+def generate_sig_generator(i=1):
+    sigs = [
+            signals[f'IC_PCS_Power_Q{i}'], 
+            signals['IC_P_tot2'],
+            ]
+    return sigs
+
 def generate_sig_probes_Qi(i=1):
     sig_probes_Qi = [
     signals[f'IC_P_Q{i}'],
         [signals[f'IC_Rc_Q{i}_left'], signals[f'IC_Rc_Q{i}_right']],
     [signals[f'IC_Voltage_left_upper_Q{i}'], signals[f'IC_Voltage_left_lower_Q{i}']],
     [signals[f'IC_Voltage_right_upper_Q{i}'], signals[f'IC_Voltage_right_lower_Q{i}']],
-    
+    [signals[f'IC_Current_left_upper_Q{i}'], signals[f'IC_Current_left_lower_Q{i}']],
+    [signals[f'IC_Current_right_upper_Q{i}'], signals[f'IC_Current_right_lower_Q{i}']],
     [signals[f'IC_delta_phi_toro_Q{i}_Bot_LmR'], signals[f'IC_delta_phi_toro_Q{i}_Top_LmR']],
     [signals[f'IC_delta_phi_polo_Q{i}_Left_BmT'], signals[f'IC_delta_phi_polo_Q{i}_Right_BmT']],        
     ]
@@ -55,11 +65,11 @@ def generate_sig_capas_Qi(i=1):
     return sig_probes_Qi
 
 #%%
-pulses = [54449, 54453]
-pulses = [54461, 54462]
-pulses = [54537, 54544, 54545]
-pulses = [54635, 54637, 54638 ]
-pulses = [54758]
+pulses = [54902, 54989]
+
+#%%
+sig_gen = generate_sig_generator()
+fig, axes = scope(pulses, sig_gen, do_smooth=False, window_loc=(600,0))
 
 #%%
 sig_generalQ1 = generate_sig_generalQi(1)
@@ -118,6 +128,7 @@ sig_general = [
         signals['Ip'],
         signals['nl'],
         signals['Rext_median'],
+        signals['Zgeo'],
         #signals['IC_P_tot'],#[signals['LH_P_LH1'], signals['LH_P_LH2']],
         signals['LH_P_tot'],
         #signals['IC_P_tot'],

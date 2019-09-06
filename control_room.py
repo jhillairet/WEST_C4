@@ -32,9 +32,16 @@ signals = {
     ## ICRH
     # IC coupled powers
     'IC_P_tot': {'name': 'SICHPTOT', 'unit': 'kW', 'label': 'IC total coupled power'},
+    'IC_P_tot2': {'name': None, 'fun':'sum_power', 'unit': 'kW', 'label': 'IC total coupled power'},
     'IC_P_Q1': {'name': 'SICHPQ1', 'unit': 'kW', 'label': 'IC Q1 coupled power'},
     'IC_P_Q2': {'name': 'SICHPQ2', 'unit': 'kW', 'label': 'IC Q2 coupled power'},
     'IC_P_Q4': {'name': 'SICHPQ4', 'unit': 'kW', 'label': 'IC Q4 coupled power'},
+    'IC_P_Gen1': {'name': 'GICHPTRAGEN%1', 'unit': 'kW', 'label': 'Generator 1 transmitted power'},
+    'IC_P_Gen2': {'name': 'GICHPTRAGEN%2', 'unit': 'kW', 'label': 'Generator 2 transmitted power'},
+    'IC_P_Gen3': {'name': 'GICHPTRAGEN%3', 'unit': 'kW', 'label': 'Generator 3 transmitted power'},
+    'IC_P_Gen4': {'name': 'GICHPTRAGEN%4', 'unit': 'kW', 'label': 'Generator 4 transmitted power'},
+    'IC_P_Gen5': {'name': 'GICHPTRAGEN%5', 'unit': 'kW', 'label': 'Generator 5 transmitted power'},
+    'IC_P_Gen6': {'name': 'GICHPTRAGEN%6', 'unit': 'kW', 'label': 'Generator 6 transmitted power'},
     # IC antenna positions (use tsmat)
     'IC_Positions': {'name': None, 'fun': 'IC_Positions', 'unit': 'm', 'label': 'IC Antenna positions'},
     'LH_Positions': {'name': None, 'fun': 'LH_Positions', 'unit': 'm', 'label': 'LH Antenna positions'},
@@ -308,6 +315,8 @@ def IC_Errors(pulse):
     '''
     y = pw.tsmat(pulse, 'DFCI;PILOTAGE;ICHINT')
     return y, np.array([-1, -1, -1])
+
+
 
 def IC_Rc_Q1_avg(pulse):
     #Q1RcLeft,  t_Q1RcLeft  = pw.tsbase(pulse, 'GICHCOUPRES%1', nargout=2)
@@ -639,3 +648,11 @@ def Prad(pulse):
     
     except ModuleNotFoundError as e:
         raise ModuleNotFoundError('pradwest only available on linux machines')
+
+
+def sum_power(pulse):
+    P1, t1 = pw.tsmat(pulse, 'SICHPQ1', nargout=2)
+    P2, t2 = pw.tsmat(pulse, 'SICHPQ2', nargout=2)
+    P4, t4 = pw.tsmat(pulse, 'SICHPQ4', nargout=2)
+    return P1+P2+P4, t1
+    

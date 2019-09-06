@@ -36,22 +36,25 @@ P_Q4, t_Q4 = get_sig(pulse, signals['IC_P_Q4'])
 #%% 
 fig, ax = plt.subplots(2,1,sharex=True)
 ax[0].plot(t_Ip, Ip, lw=2)
+ax[1].plot(t_Q4, P_Q4, label='IC Q4', lw=2, color='C2')
 ax2 = ax[0].twinx()
-ax2.plot(t_nl, nl, lw=2)
-ax2.set_ylabel('nl', fontsize=12)
-ax[0].set_ylabel('Ip', fontsize=12)
+ax2.plot(t_nl, nl, lw=2, color='C1')
 
-ax[1].plot(t_Q4, P_Q4, label='IC Q4', lw=2)
-ax[0].set_xlim(-0.1, 12.3)
-[a.grid(True, alpha=0.2) for a in ax]
-
-[a.tick_params(labelsize=14) for a in ax]
-
-fig.suptitle(f'WEST #{pulse}', fontsize=14)
 ax[1].set_xlabel('Time [s]', fontsize=14)
+ax[0].set_ylabel('Ip [kA]', fontsize=14, color='C0')
+ax2.set_ylabel('nl [$10^{19}$ $m^{-3}$]', fontsize=14, color='C1')
+ax[1].set_ylabel('IC Power [kW]', fontsize=14)
+ax[1].legend(('IC Q4',), fontsize=12)
+[a.grid(True, alpha=0.2) for a in ax]
+[a.tick_params(labelsize=14) for a in ax]
+ax[0].tick_params(color='C0', labelcolor='C0')
+ax2.tick_params(color='C1', labelcolor='C1')
 
+ax[0].set_xlim(-0.1, 12.3)
 
+ax[0].set_title(f'WEST #{pulse}', fontsize=14)
 fig.tight_layout()
+
 #%%
-savefig('WEST_IC_54732.png', dpi=150)
+savefig('WEST_IC_54891.png', dpi=150)
 
