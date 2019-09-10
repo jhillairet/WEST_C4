@@ -18,10 +18,10 @@ P_LH_54461, t_P_LH_54461 = get_sig(54461, signals['LH_P_tot'])
 P_IC_54462, t_P_IC_54462 = get_sig(54462, signals['IC_P_tot'])
 P_LH_54462, t_P_LH_54462 = get_sig(54462, signals['LH_P_tot'])
 #%%
-t_start_wo = 5.0
-t_stop_wo = 5.1
-t_start = 3.25
-t_stop = 4.1
+t_start_wo = 2.5
+t_stop_wo = 2.75
+t_start = 3.5
+t_stop = 3.75
 
 #%%
 fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True)
@@ -138,7 +138,7 @@ ax.axvline(3.011, color='k')
 ax.set_ylabel('Density [$m^{-3}$]', fontsize=12)
 ax.set_xlabel('Radius [m]', fontsize=12)
 
-µ#%%
+#%%
 r_min, ne_min, r_max, ne_max = time_averaged_profile2(data_54461, 4.0, 4.25)
 
 ax.fill(np.append(r_min, r_max[::-1]), 
@@ -148,59 +148,12 @@ ax.plot(r_min, ne_min, c='r')
 ax.plot(r_max, ne_max, c='r')
 
 
-#%%
-fig, ax = plt.subplots()
 
-r_min, ne_min, r_max, ne_max = time_averaged_profile2(data_54461, 2.5, 2.75)
-
-ax.fill(np.append(r_min, r_max[::-1]), 
-        np.append(ne_min, ne_max[::-1]))
-
-r_min, ne_min, r_max, ne_max = time_averaged_profile2(data_54462, 2.5, 2.75)
-
-ax.fill(np.append(r_min, r_max[::-1]), 
-        np.append(ne_min, ne_max[::-1]))
-
-r_min, ne_min, r_max, ne_max = time_averaged_profile2(data_54461, 3.5, 3.75)
-
-ax.fill(np.append(r_min, r_max[::-1]), 
-        np.append(ne_min, ne_max[::-1]))
-
-r_min, ne_min, r_max, ne_max = time_averaged_profile2(data_54462, 3.5, 3.75)
-
-ax.fill(np.append(r_min, r_max[::-1]), 
-        np.append(ne_min, ne_max[::-1]))
-
-#%%
-fig, ax = plt.subplots()
-
-ax.fill_between(r1, m1-s1, m1+s1, alpha=.2)
-ax.plot(r1, m1, lw=2, ls='--', label='54461 - no power')
-ax.fill_between(r2, m2-s2, m2+s2, alpha=.2)
-ax.plot(r2, m2, lw=2, ls='--', label='54462 - no power')
-
-ax.fill_between(r3, m3-s3, m3+s3, alpha=.2)
-ax.plot(r3, m3, lw=2, ls='-', label='54461 - LH and IC')
-ax.fill_between(r4, m4-s4, m4+s4, alpha=.2)
-ax.plot(r4, m4, lw=2, ls='-', label='54462 - LH only')
-
-
-xlim((2.96, 3.02))
-yscale('log')
-legend()
-grid(True)
-grid(True, which='minor', alpha=0.5)
-axvline(3.011, color='k')
-ylabel('Density [$m^{-3}$]', fontsize=12)
-xlabel('Radius [m]', fontsize=12)
-
-title('WEST 54461-54462', fontsize=12)
-
-#%%
+#%% cherry picking a time --> wrong approache as it may be misleading
 figure()
 
-idx_t54461 = argmin(abs(data_54461['tX'] - 5.0))
-idx_t54462 = argmin(abs(data_54462['tX'] - 4.0))
+idx_t54461 = argmin(abs(data_54461['tX'] - 4.0))
+idx_t54462 = argmin(abs(data_54462['tX'] - 4.01))
 plot(data_54461['RX'][idx_t54461,:], data_54461['NEX'][idx_t54461,:], label='54461 (4s)- LH (300 kW) and IC  (1.5MW) ', lw=2)
 plot(data_54462['RX'][idx_t54462,:], data_54462['NEX'][idx_t54462,:], label='54462 (4s)- LH only (500kW)', lw=2)
  
