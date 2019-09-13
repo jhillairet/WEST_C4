@@ -23,6 +23,18 @@ ts = [(09.1, 09.3),  # during LH, before IC
       (11.8, 11.9),  # during LH, during IC
       ]
 
+#%%
+I_max = 915
+
+I, t_I = pw.tsbase(pulse, 'GICHICAPA', nargout=2)
+I_Q1_max = np.amax(I[:,1:4])
+I_Q2_max = np.amax(I[:,4:8])
+I_Q4_max = np.amax(I[:,8:12]) 
+
+P_Q1_max = P_Q1 * (I_max/I_Q1_max)**2 
+P_Q2_max = P_Q2 * (I_max/I_Q2_max)**2 
+P_Q4_max = P_Q4 * (I_max/I_Q4_max)**2 
+P_max =  P_Q4_max
 
 #%%
 P_IC_tot, t_tot = get_sig(pulse, signals['IC_P_tot'])
@@ -50,6 +62,7 @@ ax1.fill_between(t_tot, _P_LH_tot*1e3 + P_IC_tot.squeeze(), alpha=0.2, label='To
 ax1.plot(t_LH1, P_LH1, label='LH1', lw=2)
 ax1.plot(t_LH2, P_LH2, label='LH2', lw=2)
 ax1.plot(t_Q4, P_Q4, label='IC Q4', lw=2)
+ax1.plot(t_Q4, P_max, color='r')
 ax1.set_ylabel('P RF [kW]')
 
 ax2.plot(t_Rc_Q4, Rc_Q4)

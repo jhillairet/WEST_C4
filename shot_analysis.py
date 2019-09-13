@@ -57,7 +57,7 @@ def generate_sig_capas_Qi(i=1):
     return sig_probes_Qi
 
 #%%
-pulses = [55105]
+pulses = [55106]
 
 
 #%%
