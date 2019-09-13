@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+|# -*- coding: utf-8 -*-
 """
 
 """
@@ -12,7 +12,6 @@ def generate_sig_generalQi(i=1):
         signals[f'IC_PCS_interdiction_Q{i}'],
         signals[f'IC_PCS_Power_Q{i}'], 
         #signals[f'IC_P_Q{i}'],
-        signals['IC_P_tot'],
         [signals[f'IC_P_Q{i}_left_fwd'], signals[f'IC_P_Q{i}_left_ref']],
         [signals[f'IC_P_Q{i}_right_fwd'], signals[f'IC_P_Q{i}_right_ref']],
         [signals[f'IC_VSWR_Q{i}_Left'], signals[f'IC_VSWR_Q{i}_Right']],
@@ -30,13 +29,6 @@ def generate_sig_generalQi(i=1):
     ]
     return sigs_general_Qi
 
-
-def generate_sig_generator(i=1):
-    sigs = [
-            signals[f'IC_PCS_Power_Q{i}'], 
-            signals['IC_P_tot2'],
-            ]
-    return sigs
 
 def generate_sig_probes_Qi(i=1):
     sig_probes_Qi = [
@@ -65,11 +57,8 @@ def generate_sig_capas_Qi(i=1):
     return sig_probes_Qi
 
 #%%
-pulses = [54902, 54989]
+pulses = [55015]
 
-#%%
-sig_gen = generate_sig_generator()
-fig, axes = scope(pulses, sig_gen, do_smooth=False, window_loc=(600,0))
 
 #%%
 sig_generalQ1 = generate_sig_generalQi(1)
@@ -198,5 +187,16 @@ sig_voltage_probes = [
     [signals[f'IC_Rc_Q1_left'],             signals[f'IC_Rc_Q2_left'],              signals[f'IC_Rc_Q4_left']               ],
     [signals[f'IC_Rc_Q1_right'],            signals[f'IC_Rc_Q2_right'],             signals[f'IC_Rc_Q4_right']              ],
         ]
-fig, axes = scope(pulses, sig_voltage_probes, do_smooth=False)
+fig, axes = scope(pulses, sig_voltage_probes, do_smooth=True, cycling_mode='color')
 axes[0].legend()
+
+#%%
+sigs = [
+        signals['Ip'],
+        signals['nl'],
+        signals['Rext_median'],
+        signals['IC_P_tot'],
+        ]
+fig, axes = scope(pulses, sigs, do_smooth=True, lw=2)
+axes[0].set_xlim(0, 13)
+axes[2].set_ylim(2910, 2950)

@@ -11,9 +11,9 @@ signals = {
     ## Magnetics
     'Ip': {'name': 'SMAG_IP', 'unit': 'kA', 'label': 'Plasma current'},
     'Vloop': {'name': 'GMAG_VLOOP%1', 'unit': 'V', 'label': 'Loop voltage'},
-    'Rext_upper': {'name': 'GMAG_TEST%2', 'unit': 'm', 'label': 'Rext upper'},  # Rext upper
+    'Rext_upper': {'name': 'GMAG_TEST%4', 'unit': 'm', 'label': 'Rext upper'},  # Rext upper
     'Rext_median': {'name': 'GMAG_TEST%2', 'unit': 'm', 'label': 'Rext median', 'options':{'ylim':(2950, 3010)}},  # Rext median
-    'Rext_lower': {'name': 'GMAG_TEST%2', 'unit': 'm', 'label': 'Rext lower'},  # Rext lower
+    'Rext_lower': {'name': 'GMAG_TEST%5', 'unit': 'm', 'label': 'Rext lower'},  # Rext lower
     'Zgeo': {'name': 'GMAG_BARY%2', 'unit': 'm', 'label': 'Zgeo'},  # Zgeo barycentre
     'R0': {'name': 'GMAG_BARY%1', 'unit': 'm', 'label': 'Large radius'},  # grand rayon
     'Ignitron': {'name' : None, 'fun': 'tignitron', 'unit': 's', 'label': 'Ignitron Time'},
@@ -42,6 +42,18 @@ signals = {
     'IC_P_Gen4': {'name': 'GICHPTRAGEN%4', 'unit': 'kW', 'label': 'Generator 4 transmitted power'},
     'IC_P_Gen5': {'name': 'GICHPTRAGEN%5', 'unit': 'kW', 'label': 'Generator 5 transmitted power'},
     'IC_P_Gen6': {'name': 'GICHPTRAGEN%6', 'unit': 'kW', 'label': 'Generator 6 transmitted power'},
+    'IC_P_Gen1_ref' : {'name': 'GICHPREFGEN%1', 'unit': 'kW', 'label': 'Generator 1 reflected power'},
+    'IC_P_Gen2_ref' : {'name': 'GICHPREFGEN%2', 'unit': 'kW', 'label': 'Generator 2 reflected power'},
+    'IC_P_Gen3_ref' : {'name': 'GICHPREFGEN%3', 'unit': 'kW', 'label': 'Generator 3 reflected power'},
+    'IC_P_Gen4_ref' : {'name': 'GICHPREFGEN%4', 'unit': 'kW', 'label': 'Generator 4 reflected power'},
+    'IC_P_Gen5_ref' : {'name': 'GICHPREFGEN%5', 'unit': 'kW', 'label': 'Generator 5 reflected power'},
+    'IC_P_Gen6_ref' : {'name': 'GICHPREFGEN%6', 'unit': 'kW', 'label': 'Generator 6 reflected power'},
+    'IC_P_Gen1_fwd' : {'name': None, 'fun':'IC_Gen_fwd1', 'unit': 'kW', 'label': 'Generator 1 forward power'},
+    'IC_P_Gen2_fwd' : {'name': None, 'fun':'IC_Gen_fwd2', 'unit': 'kW', 'label': 'Generator 2 forward power'},
+    'IC_P_Gen3_fwd' : {'name': None, 'fun':'IC_Gen_fwd3', 'unit': 'kW', 'label': 'Generator 3 forward power'},
+    'IC_P_Gen4_fwd' : {'name': None, 'fun':'IC_Gen_fwd4', 'unit': 'kW', 'label': 'Generator 4 forward power'},
+    'IC_P_Gen5_fwd' : {'name': None, 'fun':'IC_Gen_fwd5', 'unit': 'kW', 'label': 'Generator 5 forward power'},
+    'IC_P_Gen6_fwd' : {'name': None, 'fun':'IC_Gen_fwd6', 'unit': 'kW', 'label': 'Generator 6 forward power'},
     # IC antenna positions (use tsmat)
     'IC_Positions': {'name': None, 'fun': 'IC_Positions', 'unit': 'm', 'label': 'IC Antenna positions'},
     'LH_Positions': {'name': None, 'fun': 'LH_Positions', 'unit': 'm', 'label': 'LH Antenna positions'},
@@ -396,7 +408,27 @@ def IC_Current_right_max_Q2(pulse):
 def IC_Current_right_max_Q4(pulse):
     return IC_VI_max_Qi(pulse, i=4, side='right', sig='Current')
 
+"""
+Forward power at generator. 
+Available signals concern transmitted and reflected, so fwd is reconstructed
+"""
+def IC_Gen_fwd1(pulse):
+    return IC_Gen_fwd(pulse, i=1)
+def IC_Gen_fwd2(pulse):
+    return IC_Gen_fwd(pulse, i=2)
+def IC_Gen_fwd3(pulse):
+    return IC_Gen_fwd(pulse, i=3)
+def IC_Gen_fwd4(pulse):
+    return IC_Gen_fwd(pulse, i=4)
+def IC_Gen_fwd5(pulse):
+    return IC_Gen_fwd(pulse, i=5)
+def IC_Gen_fwd6(pulse):
+    return IC_Gen_fwd(pulse, i=6)
 
+def IC_Gen_fwd(pulse, i=1):
+    p_tra, t_p_tra = pw.tsbase(pulse, f'GICHPTRAGEN%{i}', nargout=2)
+    p_ref, t_p_ref = pw.tsbase(pulse, f'GICHPREFGEN%{i}', nargout=2)
+    return p_tra + p_ref, t_p_tra
 
 """
 phases ICRH
@@ -544,6 +576,7 @@ def pulse_datetime(pulse):
     pulse_dt = pd.to_datetime(date_apilote)
     return pulse_dt, pulse_dt.to_pydatetime()
 
+  
 
 def mean_min_max(y):
     """
@@ -558,8 +591,13 @@ def mean_std(y):
     """
     return np.mean(y), np.std(y)
 
+def mean_std_in_between(y, t, t_start=0, t_end=1000):
+    _y, _t = in_between(y, t, t_start, t_end)
+    return mean_std(_y)
 
-def scope(pulses, signames, do_smooth=False, style_label='default', window_loc=(0,0)):
+def scope(pulses, signames, 
+          do_smooth=False, style_label='default', cycling_mode='ls',
+          window_loc=(0,0), **kwargs):
     
     with plt.style.context(style_label):
     
@@ -585,14 +623,18 @@ def scope(pulses, signames, do_smooth=False, style_label='default', window_loc=(
             for (sigs, ax) in zip(signames, axes):
                 _legend = ''
                 _lines = cycle(['-',':', '--', '-.'])
+                _colors = cycle(['C0', 'C1', 'C2', 'C3', 'C4', 'C5'])
                 # if a list: superpose the trace on the same axe
                 if not isinstance(sigs, list):
                     sigs = [sigs]
                 for sig in sigs:
                     
                     y, t = get_sig(pulse, sig, do_smooth)
-        
-                    ax.plot(t, y, label=f'#{pulse}', color=_color, ls=next(_lines))
+                    if cycling_mode == 'ls':
+                        ax.plot(t, y, label=f'#{pulse}', color=_color, ls=next(_lines), **kwargs)
+                    elif cycling_mode == 'color':
+                        ax.plot(t, y, label=f'#{pulse}', color=next(_colors), **kwargs)
+                    
                     _legend += f"{sig['label']}, "
                 ax.set_ylabel(f"[{sig['unit']}]")
                 ax.text(0.01, 0.85, _legend, color='gray',
