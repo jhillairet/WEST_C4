@@ -57,7 +57,7 @@ def generate_sig_capas_Qi(i=1):
     return sig_probes_Qi
 
 #%%
-pulses = [55015]
+pulses = [55105]
 
 
 #%%
@@ -200,3 +200,20 @@ sigs = [
 fig, axes = scope(pulses, sigs, do_smooth=True, lw=2)
 axes[0].set_xlim(0, 13)
 axes[2].set_ylim(2910, 2950)
+
+#%%
+
+sigs_phase = [
+    [signals['IC_P_Q1'], signals['IC_P_Q2'], signals['IC_P_Q4']],
+    [signals['IC_Rc_Q1_left'], signals['IC_Rc_Q1_right']],
+    [signals['IC_Rc_Q4_left'], signals['IC_Rc_Q4_right']],
+    signals['IC_Phase_Q1 (Pf_Left - Pf_Right)'],
+    signals['IC_Phase_Q1 (Pr_Left - Pf_Right)'],
+    signals['IC_Phase_Q1 (Pr_Right - Pf_Right)'],
+    signals['IC_Phase_Q1 (V1 - Pf_Left)'],
+    signals['IC_Phase_Q1 (V2 - Pf_Left)'],
+    signals['IC_Phase_Q1 (V3 - Pf_Right)'],
+    signals['IC_Phase_Q1 (V4 - Pf_Right)'],
+        ]
+fig, axes = scope([54902], sigs_phase, do_smooth=False, lw=2, cycling_mode='color')
+
