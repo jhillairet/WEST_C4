@@ -14,7 +14,7 @@ from matplotlib.pyplot import *
 
 
 #%%
-pulse = 55015
+pulse = 55014
 
 Ip, t_Ip = get_sig(pulse, signals['Ip'])
 nl, t_nl = get_sig(pulse, signals['nl'])
@@ -190,9 +190,3 @@ fig.subplots_adjust(hspace=0)
 
 #%%
 savefig(f'WEST_IC_{pulse}_Dco.png', dpi=150)
-
-
-
-
-
-

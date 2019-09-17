@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import pywed as pw
 import pandas as pd
 from itertools import cycle
+from scipy.io import loadmat
 
 signals = {
     ## Shot properties
@@ -11,9 +12,9 @@ signals = {
     ## Magnetics
     'Ip': {'name': 'SMAG_IP', 'unit': 'kA', 'label': 'Plasma current'},
     'Vloop': {'name': 'GMAG_VLOOP%1', 'unit': 'V', 'label': 'Loop voltage'},
-    'Rext_upper': {'name': 'GMAG_TEST%4', 'unit': 'm', 'label': 'Rext upper'},  # Rext upper
+    'Rext_upper': {'name': 'GMAG_TEST%1', 'unit': 'm', 'label': 'Rext upper'},  # Rext upper
     'Rext_median': {'name': 'GMAG_TEST%2', 'unit': 'm', 'label': 'Rext median', 'options':{'ylim':(2950, 3010)}},  # Rext median
-    'Rext_lower': {'name': 'GMAG_TEST%5', 'unit': 'm', 'label': 'Rext lower'},  # Rext lower
+    'Rext_lower': {'name': 'GMAG_TEST%3', 'unit': 'm', 'label': 'Rext lower'},  # Rext lower
     'Zgeo': {'name': 'GMAG_BARY%2', 'unit': 'm', 'label': 'Zgeo'},  # Zgeo barycentre
     'R0': {'name': 'GMAG_BARY%1', 'unit': 'm', 'label': 'Large radius'},  # grand rayon
     'Ignitron': {'name' : None, 'fun': 'tignitron', 'unit': 's', 'label': 'Ignitron Time'},
