@@ -15,6 +15,11 @@ signals = {
     'Rext_upper': {'name': 'GMAG_TEST%1', 'unit': 'm', 'label': 'Rext upper'},  # Rext upper
     'Rext_median': {'name': 'GMAG_TEST%2', 'unit': 'm', 'label': 'Rext median', 'options':{'ylim':(2950, 3010)}},  # Rext median
     'Rext_lower': {'name': 'GMAG_TEST%3', 'unit': 'm', 'label': 'Rext lower'},  # Rext lower
+    'Dext_Q1': {'name': None, 'fun':'Dext_Q1', 'unit': 'mm', 'label': 'Radial Gap with Q1', 'options':{'ylim':(0, 60)}},
+    'Dext_Q2': {'name': None, 'fun':'Dext_Q2', 'unit': 'mm', 'label': 'Radial Gap with Q2', 'options':{'ylim':(0, 60)}},
+    'Dext_Q4': {'name': None, 'fun':'Dext_Q4', 'unit': 'mm', 'label': 'Radial Gap with Q4', 'options':{'ylim':(0, 60)}},
+    'Dext_LH1': {'name': None, 'fun':'Dext_LH1', 'unit': 'mm', 'label': 'Radial Gap with LH1', 'options':{'ylim':(0, 60)}},
+    'Dext_LH2': {'name': None, 'fun':'Dext_LH2', 'unit': 'mm', 'label': 'Radial Gap with LH2', 'options':{'ylim':(0, 60)}},
     'Zgeo': {'name': 'GMAG_BARY%2', 'unit': 'm', 'label': 'Zgeo'},  # Zgeo barycentre
     'R0': {'name': 'GMAG_BARY%1', 'unit': 'm', 'label': 'Large radius'},  # grand rayon
     'Ignitron': {'name' : None, 'fun': 'tignitron', 'unit': 's', 'label': 'Ignitron Time'},
@@ -699,3 +704,37 @@ def sum_power(pulse):
     P4, t4 = pw.tsmat(pulse, 'SICHPQ4', nargout=2)
     return P1+P2+P4, t1
     
+
+
+
+def Dext(pulse, antenna='Q1'):
+    """
+    Gap between the LCFS (Rext_median) and an antenna
+    """
+    Rext, t_ext = get_sig(pulse, signals['Rext_median'])
+    PosLH, t_PosLH = get_sig(pulse, signals['LH_Positions'])
+    PosIC, t_PosIC = get_sig(pulse, signals['IC_Positions'])
+    
+    if antenna == 'Q1':
+        Pos = PosIC[0]
+    elif antenna == 'Q2':
+        Pos = PosIC[1]
+    elif antenna == 'Q4':
+        Pos = PosIC[2]
+    elif antenna == 'LH1':
+        Pos = PosLH[0]
+    elif antenna == 'LH2':
+        Pos = PosLH[1]
+    
+    return Pos*1e3 - Rext, t_ext
+
+def Dext_Q1(pulse):
+    return Dext(pulse, antenna='Q1')
+def Dext_Q2(pulse):
+    return Dext(pulse, antenna='Q2')
+def Dext_Q4(pulse):
+    return Dext(pulse, antenna='Q4')
+def Dext_LH1(pulse):
+    return Dext(pulse, antenna='LH1')
+def Dext_LH2(pulse):
+    return Dext(pulse, antenna='LH2')
