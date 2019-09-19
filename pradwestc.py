@@ -440,7 +440,8 @@ la base de données IMAs. la syntaxe devient:
  kk3=[kk for kk in ld if to[kk]>0 if to[kk]<10]
  mP1=N.mean(P1[kk3],dtype=N.float32)
  mP2=N.mean(P2[kk3],dtype=N.float32)
- if N.max(mP1,mP2)>1e-2: 
+# import pdb; pdb.set_trace()
+ if N.max([mP1,mP2])>1e-2: 
      ev=1
      plt.disp('sufficient signal to be meaningfull')
  else:
