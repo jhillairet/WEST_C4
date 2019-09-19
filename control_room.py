@@ -12,6 +12,7 @@ signals = {
     ## Magnetics
     'Ip': {'name': 'SMAG_IP', 'unit': 'kA', 'label': 'Plasma current'},
     'Vloop': {'name': 'GMAG_VLOOP%1', 'unit': 'V', 'label': 'Loop voltage'},
+    'Te': {'name':None, 'fun':'Te', 'unit':'eV', 'label':'Te Central' },
     'Rext_upper': {'name': 'GMAG_TEST%1', 'unit': 'm', 'label': 'Rext upper'},  # Rext upper
     'Rext_median': {'name': 'GMAG_TEST%2', 'unit': 'm', 'label': 'Rext median', 'options':{'ylim':(2950, 3010)}},  # Rext median
     'Rext_lower': {'name': 'GMAG_TEST%3', 'unit': 'm', 'label': 'Rext lower'},  # Rext lower
@@ -23,6 +24,8 @@ signals = {
     'Zgeo': {'name': 'GMAG_BARY%2', 'unit': 'm', 'label': 'Zgeo'},  # Zgeo barycentre
     'R0': {'name': 'GMAG_BARY%1', 'unit': 'm', 'label': 'Large radius'},  # grand rayon
     'Ignitron': {'name' : None, 'fun': 'tignitron', 'unit': 's', 'label': 'Ignitron Time'},
+    'Neutron1': {'name': 'GFLUNTN%1', 'unit': 'N/s', 'label':'Neutron#1'},
+    'Neutron2': {'name': 'GFLUNTN%2', 'unit': 'N/s', 'label':'Neutron#2'},
     # Movable limiter position (LPA)
     'LPA': {'name': 'GMAG_POSLPA%1', 'unit': 'm', 'label': 'LPA'},
     ## Fueling
@@ -256,6 +259,7 @@ signals = {
     'baro_Q2': {'name':'GBARDB8%4', 'unit': '--', 'label':'barometry Q2 raw'},
     'baro_Q4': {'name':'GBARDB8%9', 'unit': '--', 'label':'barometry Q4 raw'},
     ## Spectru UV
+    'Prad': {'name': None, 'fun':'Prad', 'unit':'kW', 'label':'Prad total'},
     
     }
 
@@ -690,14 +694,40 @@ def ECE_4(pulse):
     Te, t_Te = pw.tsmat(pulse, 'DVECE-GVSH4','+')
     return Te, t_Te-32
 
-def Prad(pulse):
-    try:
-        from  pradwest import pradwest
+
+def imas(func):
+    """
+    Decorator for IMAS data 
+    Will generate NaN data is IMAS is not available
+    """
+    def wrapper(*args,**kwargs):
+        try:
+            import imas_west        
+            return func(*args,**kwargs)  
+        except ModuleNotFoundError as e:
+            print('pradwest only available on linux machines')
+            return np.nan, np.nan
     
-    except ModuleNotFoundError as e:
-        raise ModuleNotFoundError('pradwest only available on linux machines')
+        except FileNotFoundError as e:
+            print('IMAS file does not exist (yet?)')
+            return np.nan, np.nan
+    return wrapper
 
+@imas
+def Prad(pulse):
+    bolo = imas_west.get(pulse, 'bolometer')
+    return bolo.power_radiated_total/1e3, bolo.time - 32
 
+@imas
+def Prad_bulk(pulse):
+    bolo = imas_west.get(pulse, 'bolometer')
+    return bolo.power_radiated_inside_lcfs/1e3, bolo.time - 32
+
+@imas
+def Te(pulse):
+    ece = imas_west.get(pulse, 'ece')
+    return ece.t_e_central.data, ece.time - 32
+    
 def sum_power(pulse):
     P1, t1 = pw.tsmat(pulse, 'SICHPQ1', nargout=2)
     P2, t2 = pw.tsmat(pulse, 'SICHPQ2', nargout=2)
