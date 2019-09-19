@@ -1,2 +1,15 @@
-*.png
 *.pyc
+*.so
+*.o
+*.bak
+#*
+.#*
+.DS_Store
+.nfs*
+*.orig
+*.org
+*.reg
+*~
+*.png
+.#*
+#*

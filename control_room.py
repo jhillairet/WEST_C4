@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import pywed as pw
 import pandas as pd
 from itertools import cycle
+from scipy.io import loadmat
 
 signals = {
     ## Shot properties
@@ -11,12 +12,20 @@ signals = {
     ## Magnetics
     'Ip': {'name': 'SMAG_IP', 'unit': 'kA', 'label': 'Plasma current'},
     'Vloop': {'name': 'GMAG_VLOOP%1', 'unit': 'V', 'label': 'Loop voltage'},
-    'Rext_upper': {'name': 'GMAG_TEST%4', 'unit': 'm', 'label': 'Rext upper'},  # Rext upper
+    'Te': {'name':None, 'fun':'Te', 'unit':'eV', 'label':'Te Central' },
+    'Rext_upper': {'name': 'GMAG_TEST%1', 'unit': 'm', 'label': 'Rext upper'},  # Rext upper
     'Rext_median': {'name': 'GMAG_TEST%2', 'unit': 'm', 'label': 'Rext median', 'options':{'ylim':(2950, 3010)}},  # Rext median
-    'Rext_lower': {'name': 'GMAG_TEST%5', 'unit': 'm', 'label': 'Rext lower'},  # Rext lower
+    'Rext_lower': {'name': 'GMAG_TEST%3', 'unit': 'm', 'label': 'Rext lower'},  # Rext lower
+    'Dext_Q1': {'name': None, 'fun':'Dext_Q1', 'unit': 'mm', 'label': 'Radial Gap with Q1', 'options':{'ylim':(0, 60)}},
+    'Dext_Q2': {'name': None, 'fun':'Dext_Q2', 'unit': 'mm', 'label': 'Radial Gap with Q2', 'options':{'ylim':(0, 60)}},
+    'Dext_Q4': {'name': None, 'fun':'Dext_Q4', 'unit': 'mm', 'label': 'Radial Gap with Q4', 'options':{'ylim':(0, 60)}},
+    'Dext_LH1': {'name': None, 'fun':'Dext_LH1', 'unit': 'mm', 'label': 'Radial Gap with LH1', 'options':{'ylim':(0, 60)}},
+    'Dext_LH2': {'name': None, 'fun':'Dext_LH2', 'unit': 'mm', 'label': 'Radial Gap with LH2', 'options':{'ylim':(0, 60)}},
     'Zgeo': {'name': 'GMAG_BARY%2', 'unit': 'm', 'label': 'Zgeo'},  # Zgeo barycentre
     'R0': {'name': 'GMAG_BARY%1', 'unit': 'm', 'label': 'Large radius'},  # grand rayon
     'Ignitron': {'name' : None, 'fun': 'tignitron', 'unit': 's', 'label': 'Ignitron Time'},
+    'Neutron1': {'name': 'GFLUNTN%1', 'unit': 'N/s', 'label':'Neutron#1'},
+    'Neutron2': {'name': 'GFLUNTN%2', 'unit': 'N/s', 'label':'Neutron#2'},
     # Movable limiter position (LPA)
     'LPA': {'name': 'GMAG_POSLPA%1', 'unit': 'm', 'label': 'LPA'},
     ## Fueling
@@ -250,6 +259,7 @@ signals = {
     'baro_Q2': {'name':'GBARDB8%4', 'unit': '--', 'label':'barometry Q2 raw'},
     'baro_Q4': {'name':'GBARDB8%9', 'unit': '--', 'label':'barometry Q4 raw'},
     ## Spectru UV
+    'Prad': {'name': None, 'fun':'Prad', 'unit':'kW', 'label':'Prad total'},
     
     }
 
@@ -686,15 +696,74 @@ def ECE_4(pulse):
 
 def Prad(pulse):
     try:
-        from  pradwest import pradwest
-    
+        import imas_west
+        bolo = imas_west.get(pulse, 'bolometer')
+        return bolo.power_radiated_total/1e3, bolo.time - 32
     except ModuleNotFoundError as e:
         raise ModuleNotFoundError('pradwest only available on linux machines')
+    except FileNotFoundError as e:
+        print('IMAS file does not exist (yet?)')
+        return np.nan, np.nan
 
+def Prad_bulk(pulse):
+    try:
+        import imas_west
+        bolo = imas_west.get(pulse, 'bolometer')
+        return bolo.power_radiated_inside_lcfs/1e3, bolo.time - 32
+    except ModuleNotFoundError as e:
+        raise ModuleNotFoundError('pradwest only available on linux machines')
+    except FileNotFoundError as e:
+        print('IMAS file does not exist (yet?)')
+        return np.nan, np.nan
 
+def Te(pulse):
+    try:
+        import imas_west    
+        ece = imas_west.get(pulse, 'ece')
+        return ece.t_e_central.data, ece.time - 32
+    except ModuleNotFoundError as e:
+        raise ModuleNotFoundError('pradwest only available on linux machines')
+    except FileNotFoundError as e:
+        print('IMAS file does not exist (yet?)')
+        return np.nan, np.nan
+    
 def sum_power(pulse):
     P1, t1 = pw.tsmat(pulse, 'SICHPQ1', nargout=2)
     P2, t2 = pw.tsmat(pulse, 'SICHPQ2', nargout=2)
     P4, t4 = pw.tsmat(pulse, 'SICHPQ4', nargout=2)
     return P1+P2+P4, t1
     
+
+
+
+def Dext(pulse, antenna='Q1'):
+    """
+    Gap between the LCFS (Rext_median) and an antenna
+    """
+    Rext, t_ext = get_sig(pulse, signals['Rext_median'])
+    PosLH, t_PosLH = get_sig(pulse, signals['LH_Positions'])
+    PosIC, t_PosIC = get_sig(pulse, signals['IC_Positions'])
+    
+    if antenna == 'Q1':
+        Pos = PosIC[0]
+    elif antenna == 'Q2':
+        Pos = PosIC[1]
+    elif antenna == 'Q4':
+        Pos = PosIC[2]
+    elif antenna == 'LH1':
+        Pos = PosLH[0]
+    elif antenna == 'LH2':
+        Pos = PosLH[1]
+    
+    return Pos*1e3 - Rext, t_ext
+
+def Dext_Q1(pulse):
+    return Dext(pulse, antenna='Q1')
+def Dext_Q2(pulse):
+    return Dext(pulse, antenna='Q2')
+def Dext_Q4(pulse):
+    return Dext(pulse, antenna='Q4')
+def Dext_LH1(pulse):
+    return Dext(pulse, antenna='LH1')
+def Dext_LH2(pulse):
+    return Dext(pulse, antenna='LH2')
