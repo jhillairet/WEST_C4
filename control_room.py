@@ -23,6 +23,8 @@ signals = {
     'Zgeo': {'name': 'GMAG_BARY%2', 'unit': 'm', 'label': 'Zgeo'},  # Zgeo barycentre
     'R0': {'name': 'GMAG_BARY%1', 'unit': 'm', 'label': 'Large radius'},  # grand rayon
     'Ignitron': {'name' : None, 'fun': 'tignitron', 'unit': 's', 'label': 'Ignitron Time'},
+    'Neutron1': {'name': 'GFLUNTN%1', 'unit': 'N/s', 'label':'Neutron#1'},
+    'Neutron2': {'name': 'GFLUNTN%2', 'unit': 'N/s', 'label':'Neutron#2'},
     # Movable limiter position (LPA)
     'LPA': {'name': 'GMAG_POSLPA%1', 'unit': 'm', 'label': 'LPA'},
     ## Fueling
@@ -692,8 +694,19 @@ def ECE_4(pulse):
 
 def Prad(pulse):
     try:
-        from  pradwest import pradwest
+        import imas_west
+        bolo = imas_west.get(pulse, 'bolometer')
+        return bolo.power_radiated_total, bolo.time
     
+        plt.plot(bolo.time, bolo.power_radiated_inside_lcfs) #P_rad_bulk
+    except ModuleNotFoundError as e:
+        raise ModuleNotFoundError('pradwest only available on linux machines')
+
+def Prad_bulk(pulse):
+    try:
+        import imas_west
+        bolo = imas_west.get(pulse, 'bolometer')
+        return bolo.power_radiated_inside_lcfs, bolo.time
     except ModuleNotFoundError as e:
         raise ModuleNotFoundError('pradwest only available on linux machines')
 
