@@ -694,38 +694,39 @@ def ECE_4(pulse):
     Te, t_Te = pw.tsmat(pulse, 'DVECE-GVSH4','+')
     return Te, t_Te-32
 
+
+def imas(func):
+    """
+    Decorator for IMAS data 
+    Will generate NaN data is IMAS is not available
+    """
+    def wrapper(*args,**kwargs):
+        try:
+            import imas_west        
+            return func(*args,**kwargs)  
+        except ModuleNotFoundError as e:
+            print('pradwest only available on linux machines')
+            return np.nan, np.nan
+    
+        except FileNotFoundError as e:
+            print('IMAS file does not exist (yet?)')
+            return np.nan, np.nan
+    return wrapper
+
+@imas
 def Prad(pulse):
-    try:
-        import imas_west
-        bolo = imas_west.get(pulse, 'bolometer')
-        return bolo.power_radiated_total/1e3, bolo.time - 32
-    except ModuleNotFoundError as e:
-        raise ModuleNotFoundError('pradwest only available on linux machines')
-    except FileNotFoundError as e:
-        print('IMAS file does not exist (yet?)')
-        return np.nan, np.nan
+    bolo = imas_west.get(pulse, 'bolometer')
+    return bolo.power_radiated_total/1e3, bolo.time - 32
 
+@imas
 def Prad_bulk(pulse):
-    try:
-        import imas_west
-        bolo = imas_west.get(pulse, 'bolometer')
-        return bolo.power_radiated_inside_lcfs/1e3, bolo.time - 32
-    except ModuleNotFoundError as e:
-        raise ModuleNotFoundError('pradwest only available on linux machines')
-    except FileNotFoundError as e:
-        print('IMAS file does not exist (yet?)')
-        return np.nan, np.nan
+    bolo = imas_west.get(pulse, 'bolometer')
+    return bolo.power_radiated_inside_lcfs/1e3, bolo.time - 32
 
+@imas
 def Te(pulse):
-    try:
-        import imas_west    
-        ece = imas_west.get(pulse, 'ece')
-        return ece.t_e_central.data, ece.time - 32
-    except ModuleNotFoundError as e:
-        raise ModuleNotFoundError('pradwest only available on linux machines')
-    except FileNotFoundError as e:
-        print('IMAS file does not exist (yet?)')
-        return np.nan, np.nan
+    ece = imas_west.get(pulse, 'ece')
+    return ece.t_e_central.data, ece.time - 32
     
 def sum_power(pulse):
     P1, t1 = pw.tsmat(pulse, 'SICHPQ1', nargout=2)
