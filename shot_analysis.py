@@ -57,7 +57,7 @@ def generate_sig_capas_Qi(i=1):
     return sig_probes_Qi
 
 #%%
-pulses = [55204]
+pulses = [55206]
 
 
 #%%
@@ -119,15 +119,16 @@ sig_general = [
         signals['Te'],
         signals['Prad'],
         [signals['Neutron1'], signals['Neutron2']],
-        [signals['Dext_Q1'], signals['Dext_Q2'], signals['Dext_Q4']],
+        [signals['Rext_median'], signals['Rext_median_NICE']],
+#        [signals['Dext_Q4']],
         #signals['Zgeo'],
         #signals['IC_P_tot'],#[signals['LH_P_LH1'], signals['LH_P_LH2']],
-        #signals['LH_P_tot'],
-        #signals['IC_P_tot'],
+        signals['LH_P_tot'],
+        signals['IC_P_tot'],
         [signals['IC_P_Q1'], signals['IC_P_Q2'], signals['IC_P_Q4']],
         [signals['IC_Rc_Q1_left'], signals['IC_Rc_Q2_left'], signals['IC_Rc_Q4_left']],
         [signals['IC_Rc_Q1_right'], signals['IC_Rc_Q2_right'], signals['IC_Rc_Q4_right']],
-        [signals['Valve11'], ],
+#        [signals['Valve11'], ],
         #[signals[f'IC_Vacuum_Q1_right'], signals[f'IC_Vacuum_Q2_right'], signals[f'IC_Vacuum_Q4_right'] ],
         #signals['Cu'],
         ]

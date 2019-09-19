@@ -13,9 +13,10 @@ signals = {
     'Ip': {'name': 'SMAG_IP', 'unit': 'kA', 'label': 'Plasma current'},
     'Vloop': {'name': 'GMAG_VLOOP%1', 'unit': 'V', 'label': 'Loop voltage'},
     'Te': {'name':None, 'fun':'Te', 'unit':'eV', 'label':'Te Central' },
-    'Rext_upper': {'name': 'GMAG_TEST%1', 'unit': 'm', 'label': 'Rext upper'},  # Rext upper
-    'Rext_median': {'name': 'GMAG_TEST%2', 'unit': 'm', 'label': 'Rext median', 'options':{'ylim':(2950, 3010)}},  # Rext median
-    'Rext_lower': {'name': 'GMAG_TEST%3', 'unit': 'm', 'label': 'Rext lower'},  # Rext lower
+    'Rext_upper': {'name': 'GMAG_TEST%1', 'unit': 'mm', 'label': 'Rext upper'},  # Rext upper
+    'Rext_median': {'name': 'GMAG_TEST%2', 'unit': 'mm', 'label': 'Rext median', 'options':{'ylim':(2900, 2950)}},  # Rext median
+    'Rext_lower': {'name': 'GMAG_TEST%3', 'unit': 'mm', 'label': 'Rext lower'},  # Rext lower
+    'Rext_median_NICE': {'name':None, 'fun':'Rext_median_nice', 'unit':'mm', 'label':'Rext median (NICE)', 'options':{'ylim':(2900, 2950)}},
     'Dext_Q1': {'name': None, 'fun':'Dext_Q1', 'unit': 'mm', 'label': 'Radial Gap with Q1', 'options':{'ylim':(0, 60)}},
     'Dext_Q2': {'name': None, 'fun':'Dext_Q2', 'unit': 'mm', 'label': 'Radial Gap with Q2', 'options':{'ylim':(0, 60)}},
     'Dext_Q4': {'name': None, 'fun':'Dext_Q4', 'unit': 'mm', 'label': 'Radial Gap with Q4', 'options':{'ylim':(0, 60)}},
@@ -258,9 +259,9 @@ signals = {
     ## Barometry
     'baro_Q2': {'name':'GBARDB8%4', 'unit': '--', 'label':'barometry Q2 raw'},
     'baro_Q4': {'name':'GBARDB8%9', 'unit': '--', 'label':'barometry Q4 raw'},
-    ## Spectru UV
+    ## Bolometry
     'Prad': {'name': None, 'fun':'Prad', 'unit':'kW', 'label':'Prad total'},
-    
+    'Prad_bulk': {'name': None, 'fun':'Prad_bulk', 'unit':'kW', 'label':'Prad bulk'},    
     }
 
 def VSWR_Q1_Left(pulse):
@@ -641,6 +642,7 @@ def scope(pulses, signames,
                     
                     y, t = get_sig(pulse, sig, do_smooth)
                     if cycling_mode == 'ls':
+#                        import pdb;pdb.set_trace()
                         ax.plot(t, y, label=f'#{pulse}', color=_color, ls=next(_lines), **kwargs)
                     elif cycling_mode == 'color':
                         ax.plot(t, y, label=f'#{pulse}', color=next(_colors), **kwargs)
@@ -695,6 +697,11 @@ def ECE_4(pulse):
     return Te, t_Te-32
 
 
+try:
+    import imas_west        
+except ModuleNotFoundError as e:
+    print('pradwest only available on linux machines')
+
 def imas(func):
     """
     Decorator for IMAS data 
@@ -727,14 +734,19 @@ def Prad_bulk(pulse):
 def Te(pulse):
     ece = imas_west.get(pulse, 'ece')
     return ece.t_e_central.data, ece.time - 32
+
+@imas
+def Rext_median_nice(pulse):
+    equi = imas_west.get(pulse, 'equilibrium', 0, 1)
+    mask_eq = np.asarray(equi.code.output_flag) >= 0 # To remove not converged equilibria
+    r_ext = np.max(equi.profiles_1d.r_outboard[mask_eq], axis=1)
+    return r_ext*1e3, equi.time[mask_eq] - 32
     
 def sum_power(pulse):
     P1, t1 = pw.tsmat(pulse, 'SICHPQ1', nargout=2)
     P2, t2 = pw.tsmat(pulse, 'SICHPQ2', nargout=2)
     P4, t4 = pw.tsmat(pulse, 'SICHPQ4', nargout=2)
     return P1+P2+P4, t1
-    
-
 
 
 def Dext(pulse, antenna='Q1'):
