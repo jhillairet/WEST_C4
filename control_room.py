@@ -260,8 +260,10 @@ signals = {
     'baro_Q2': {'name':'GBARDB8%4', 'unit': '--', 'label':'barometry Q2 raw'},
     'baro_Q4': {'name':'GBARDB8%9', 'unit': '--', 'label':'barometry Q4 raw'},
     ## Bolometry
-    'Prad': {'name': None, 'fun':'Prad', 'unit':'kW', 'label':'Prad total'},
-    'Prad_bulk': {'name': None, 'fun':'Prad_bulk', 'unit':'kW', 'label':'Prad bulk'},    
+    'Prad': {'name': None, 'fun':'Prad', 'unit':'MW', 'label':'Prad total'},
+    'Prad_bulk': {'name': None, 'fun':'Prad_bulk', 'unit':'MW', 'label':'Prad bulk'},    
+    'Prad_imas': {'name': None, 'fun':'Prad_imas', 'unit':'MW', 'label':'Prad total (imas)'},
+    'Prad_bulk_imas': {'name': None, 'fun':'Prad_bulk_imas', 'unit':'MW', 'label':'Prad bulk (imas)'},    
     }
 
 def VSWR_Q1_Left(pulse):
@@ -684,16 +686,16 @@ def baro_Q4(pulse):
     return baroQ4BP, tbaroQ4BP 
 
 def ECE_1(pulse): 
-    Te, t_Te = pw.tsmat(pulse, 'DVECE-GVSH1','+')
+    Te, t_Te = pw.tsmat(pulse, 'DVECE-GVSH1%1','+')
     return Te, t_Te-32
 def ECE_2(pulse): 
-    Te, t_Te = pw.tsmat(pulse, 'DVECE-GVSH2','+')
+    Te, t_Te = pw.tsmat(pulse, 'DVECE-GVSH2%1','+')
     return Te, t_Te-32
 def ECE_3(pulse): 
-    Te, t_Te = pw.tsmat(pulse, 'DVECE-GVSH3','+')
+    Te, t_Te = pw.tsmat(pulse, 'DVECE-GVSH3%1','+')
     return Te, t_Te-32
 def ECE_4(pulse): 
-    Te, t_Te = pw.tsmat(pulse, 'DVECE-GVSH4','+')
+    Te, t_Te = pw.tsmat(pulse, 'DVECE-GVSH4%1','+')
     return Te, t_Te-32
 
 
@@ -720,27 +722,43 @@ def imas(func):
             return np.nan, np.nan
     return wrapper
 
-@imas
 def Prad(pulse):
+    " total radiated power in MW"
+    import pradwestc
+    try:
+        Prad,Pbulk,Pdivb,Pdivh,Pchan,bolofmas,tbolo,trad = pradwestc.pradwest1(pulse, fi=0)
+        return Prad, trad - tignitron(pulse)[0]
+    except TypeError as e:
+        return np.nan, np.nan
+
+def Prad_bulk(pulse):
+    import pradwestc
+    try:
+        Prad,Pbulk,Pdivb,Pdivh,Pchan,bolofmas,tbolo,trad = pradwestc.pradwest1(pulse, fi=0)
+        return Pbulk, trad - tignitron(pulse)[0]
+    except TypeError as e:
+        return np.nan, np.nan
+@imas
+def Prad_imas(pulse):
     bolo = imas_west.get(pulse, 'bolometer')
-    return bolo.power_radiated_total/1e3, bolo.time - 32
+    return bolo.power_radiated_total/1e6, bolo.time - tignitron(pulse)[0]
 
 @imas
-def Prad_bulk(pulse):
+def Prad_bulk_imas(pulse):
     bolo = imas_west.get(pulse, 'bolometer')
-    return bolo.power_radiated_inside_lcfs/1e3, bolo.time - 32
+    return bolo.power_radiated_inside_lcfs/1e6, bolo.time - tignitron(pulse)[0]
 
 @imas
 def Te(pulse):
     ece = imas_west.get(pulse, 'ece')
-    return ece.t_e_central.data, ece.time - 32
+    return ece.t_e_central.data, ece.time - tignitron(pulse)[0]
 
 @imas
 def Rext_median_nice(pulse):
     equi = imas_west.get(pulse, 'equilibrium', 0, 1)
     mask_eq = np.asarray(equi.code.output_flag) >= 0 # To remove not converged equilibria
     r_ext = np.max(equi.profiles_1d.r_outboard[mask_eq], axis=1)
-    return r_ext*1e3, equi.time[mask_eq] - 32
+    return r_ext*1e3, equi.time[mask_eq] - tignitron(pulse)[0]
     
 def sum_power(pulse):
     P1, t1 = pw.tsmat(pulse, 'SICHPQ1', nargout=2)

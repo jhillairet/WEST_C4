@@ -57,7 +57,7 @@ def generate_sig_capas_Qi(i=1):
     return sig_probes_Qi
 
 #%%
-pulses = [55206]
+pulses = [55151]
 
 
 #%%
@@ -116,14 +116,14 @@ axes[0].legend()
 sig_general = [
         signals['Ip'],
         signals['nl'],
-        signals['Te'],
+        signals['Te1'],
         signals['Prad'],
         [signals['Neutron1'], signals['Neutron2']],
-        [signals['Rext_median'], signals['Rext_median_NICE']],
+        [signals['Rext_median']],
 #        [signals['Dext_Q4']],
         #signals['Zgeo'],
         #signals['IC_P_tot'],#[signals['LH_P_LH1'], signals['LH_P_LH2']],
-        signals['LH_P_tot'],
+#        signals['LH_P_tot'],
         signals['IC_P_tot'],
         [signals['IC_P_Q1'], signals['IC_P_Q2'], signals['IC_P_Q4']],
         [signals['IC_Rc_Q1_left'], signals['IC_Rc_Q2_left'], signals['IC_Rc_Q4_left']],
@@ -132,7 +132,7 @@ sig_general = [
         #[signals[f'IC_Vacuum_Q1_right'], signals[f'IC_Vacuum_Q2_right'], signals[f'IC_Vacuum_Q4_right'] ],
         #signals['Cu'],
         ]
-fig, axes = scope(pulses, sig_general, do_smooth=False, window_loc=(600,0))
+fig, axes = scope(pulses, sig_general, do_smooth=True, window_loc=(600,0))
 #axes[-1].set_xlim(3.5, 6.5)
 axes[0].legend()
 
