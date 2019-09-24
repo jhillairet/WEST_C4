@@ -67,14 +67,14 @@ ax1.fill_between(t_tot, _P_LH_tot*1e3 + P_IC_tot.squeeze(), alpha=0.2, label='To
 ax1.plot(t_LH1, P_LH1, label='LH1', lw=2)
 ax1.plot(t_LH2, P_LH2, label='LH2', lw=2)
 ax1.plot(t_Q4, P_Q4, label='IC Q4', lw=2)
-ax1.plot(t_Q4, P_max, color='r')
+#ax1.plot(t_Q4, P_max, color='r')
 ax1.set_ylabel('P RF [kW]')
 
 #ax2.plot(t_Rc_Q4, Rc_Q4)
 ax2.plot(t_Rc_Q4_left, Rc_Q4_left, label='Rc Q4 left', lw=2)
 ax2.plot(t_Rc_Q4_right, Rc_Q4_right, label='Rc Q4 right', lw=2)
 ax2.set_ylabel('Rc [Ohm]')
-ax2.legend(fontsize=12, loc='upper right') 
+ax2.legend(fontsize=12, loc='upper left') 
 
 ax3.plot(t_Rext, R_IC[2]*1e3 - Rext)
 ax3.set_ylim(8, 45)
@@ -84,7 +84,7 @@ ax3.set_ylabel('[mm]')
 ax1.set_xlim(3.5, 13)
 [ax.grid(True, alpha=0.2) for ax in (ax1, ax2, ax3)]
 [ax.tick_params(labelsize=14) for ax in (ax1, ax2, ax3)]
-ax1.legend(fontsize=12, loc='upper right') 
+ax1.legend(fontsize=12, loc='upper left') 
 
 ax1.set_title(f'WEST #{pulse}', fontsize=12)
 ax3.set_xlabel('Time [s]', fontsize=12)

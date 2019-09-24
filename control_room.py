@@ -653,7 +653,7 @@ def scope(pulses, signames,
                 ax.set_ylabel(f"[{sig['unit']}]")
                 ax.text(0.01, 0.85, _legend, color='gray',
                         horizontalalignment='left', transform=ax.transAxes)
-
+                ax.autoscale(enable=True, axis='y')
                 if 'options' in sig:           
                     if 'yscale' in sig['options']:
                         ax.set_yscale(sig['options']['yscale'])

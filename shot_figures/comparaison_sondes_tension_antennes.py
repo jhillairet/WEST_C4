@@ -266,3 +266,15 @@ Q1_lower_right_avg, Q1_lower_right_std = mean_std_in_between(V_right_lower_Q1, t
 Q2_lower_right_avg, Q2_lower_right_std = mean_std_in_between(V_right_lower_Q2, t_V_right_lower_Q2, t_start=t_Q2[0], t_end=t_Q2[1])
 Q4_lower_right_avg, Q4_lower_right_std = mean_std_in_between(V_right_lower_Q4, t_V_right_lower_Q4, t_start=t_Q4[0], t_end=t_Q4[1])
 
+#%%%
+# HFSS data
+depth = [-9, -8.5, -8, -7.5, -7, -6.5, -6, -5.5, -5, -4.5, -4, -3.5, -3]
+S32 = [-96.71696595, -94.90626848, -93.32885031, -91.73440967, -89.96483378,
+       -88.39509641, -86.68707618, -85.08176306, -83.43732738, -81.80099677,
+       -80.15695652, -78.54731357, -77.05105847]
+fig, ax = plt.subplots()
+ax.plot(depth, S32, lw=2)
+ax.set_xlabel('Probe head depth [mm]', fontsize=14)
+ax.set_ylabel('Probe coupling [dB]', fontsize=14 )
+ax.grid(True)
+ax.tick_params(fontsize=12)
