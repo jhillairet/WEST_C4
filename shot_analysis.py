@@ -57,8 +57,33 @@ def generate_sig_capas_Qi(i=1):
     return sig_probes_Qi
 
 #%%
-pulses = [55014, 55015]
+pulses = [55176]
 
+#%%
+sig_phases = [
+        signals['IC_P_Q1'],
+        signals['IC_PCS_Phase_Q1'],
+        signals['IC_Phase_Q1 (Pf_Left - Pf_Right)'],
+        signals['IC_Phase_Q1 (V1 - Pf_Left)'],
+        signals['IC_Phase_Q1 (V2 - Pf_Left)'],
+        signals['IC_Phase_Q1 (V3 - Pf_Right)'],
+        signals['IC_Phase_Q1 (V4 - Pf_Right)'],
+        signals['IC_delta_phi_toro_Q1_Top_LmR'], 
+        signals['IC_delta_phi_toro_Q1_Bot_LmR'],
+        signals['IC_delta_phi_toro_Q1_LmR_FPGA']
+              ]
+fig, axes = scope(pulses, sig_phases, do_smooth=False, window_loc=(600,0))
+#axes[-1].set_xlim(3.5, 6.5)
+axes[0].legend()  
+
+#%%
+ts = (7.57, 7.80)
+val = []
+for sig in sig_phases:
+    y, t = get_sig(pulses[0], sig)
+    mean, _ = mean_std_in_between(y, t, t_start=ts[0], t_end=ts[1])
+    val.append(np.round(mean))
+print(val)
 
 #%%
 sig_generalQ1 = generate_sig_generalQi(1)
@@ -133,7 +158,7 @@ sig_general = [
         #[signals[f'IC_Vacuum_Q1_right'], signals[f'IC_Vacuum_Q2_right'], signals[f'IC_Vacuum_Q4_right'] ],
         #signals['Cu'],
         ]
-fig, axes = scope(pulses, sig_general, do_smooth=False, window_loc=(600,0), cycling_mode='ls')
+fig, axes = scope(pulses, sig_general, do_smooth=True, window_loc=(600,0), cycling_mode='ls')
 #axes[-1].set_xlim(3.5, 6.5)
 axes[0].legend()
 

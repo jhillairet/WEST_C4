@@ -448,8 +448,7 @@ phases ICRH
 """
 # TODO : passing argument to get_sig
 def delta_phi_toro_Q1_Top_LmR(pulse):
-    y = delta_phi_toro_Qi_Top_LmR(pulse, i=1)
-    return np.zeros_like(y) # mauvaise mesure --> 0
+    return delta_phi_toro_Qi_Top_LmR(pulse, i=1)
 def delta_phi_toro_Q2_Top_LmR(pulse):
     return delta_phi_toro_Qi_Top_LmR(pulse, i=2)
 def delta_phi_toro_Q4_Top_LmR(pulse):
