@@ -264,6 +264,11 @@ signals = {
     'Prad_bulk': {'name': None, 'fun':'Prad_bulk', 'unit':'MW', 'label':'Prad bulk'},    
     'Prad_imas': {'name': None, 'fun':'Prad_imas', 'unit':'MW', 'label':'Prad total (imas)'},
     'Prad_bulk_imas': {'name': None, 'fun':'Prad_bulk_imas', 'unit':'MW', 'label':'Prad bulk (imas)'},    
+    # Divertor current
+    'Divertor_lower_current_cons': {'name':'GPOLO_IDC2%1', 'unit':'kA', 'label':'Lower divertor current consigne'},
+    'Divertor_lower_current': {'name':'GPOLO_IDC2%2', 'unit':'kA', 'label':'Lower divertor current'},    
+    'Divertor_lower_voltage_cons': {'name':'GPOLO_UDC2%2', 'unit':'V', 'label':'Lower divertor current consigne'},
+    'Divertor_lower_voltage': {'name':'GPOLO_UDC2%3', 'unit':'V', 'label':'Lower divertor current'},   
     }
 
 def VSWR_Q1_Left(pulse):
