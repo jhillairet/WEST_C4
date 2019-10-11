@@ -547,6 +547,7 @@ def get_sig(pulse, sig, do_smooth=False):
             y, t = eval(eval_str)
 
         t = np.squeeze(t)
+        y = np.squeeze(y)
 
         if do_smooth:
             y_smooth = smooth(y)
@@ -708,7 +709,7 @@ def ECE_4(pulse):
 try:
     import imas_west        
 except ModuleNotFoundError as e:
-    print('pradwest only available on linux machines')
+    print('IMAS only available on linux machines')
 
 def imas(func):
     """
@@ -717,10 +718,10 @@ def imas(func):
     """
     def wrapper(*args,**kwargs):
         try:
-            import imas_west        
+            import imas_west
             return func(*args,**kwargs)  
         except ModuleNotFoundError as e:
-            print('pradwest only available on linux machines')
+            print('IMAS only available on linux machines --> return NaN')
             return np.nan, np.nan
     
         except FileNotFoundError as e:
@@ -821,14 +822,27 @@ def Ohmic_power(pulse):
     return P, t_V
 
 def Separatrix_power(pulse):
+    P_rad_b, t_Prad_b = get_sig(pulse, signals['Prad_bulk'])
+    if np.any(np.isnan(P_rad_b)):
+        # no bolometry data -> no Prad
+        return np.nan, np.nan
+
     P_Ohm, t_P_Ohm = get_sig(pulse, signals['Ohmic_P'])
     P_LH, t_LH = get_sig(pulse, signals['LH_P_tot'])
     P_IC, t_IC = get_sig(pulse, signals['IC_P_tot'])
-    P_rad_b, t_Prad_b = get_sig(pulse, signals['Prad_bulk'])
 
     t = t_P_Ohm
-    _P_LH = np.interp(t, t_LH, P_LH.squeeze())
-    _P_IC = np.interp(t, t_IC, P_IC.squeeze()) * 1e-3 # kW -> MW
+    if np.any(np.isnan(P_LH)):
+        t_LH, _P_LH = t, np.zeros_like(P_Ohm)
+    else:
+        _P_LH = np.interp(t, t_LH, P_LH.squeeze())
+
+    if np.any(np.isnan(P_IC)):
+        t_IC, _P_IC = t, np.zeros_like(P_Ohm)
+    else:
+        _P_IC = np.interp(t, t_IC, P_IC.squeeze()) * 1e-3 # kW -> MW
+
+
     _P_rad_b = np.interp(t, t_Prad_b, P_rad_b.squeeze())
 
     return P_Ohm + _P_LH + _P_IC - _P_rad_b, t
