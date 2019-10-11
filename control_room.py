@@ -13,6 +13,7 @@ signals = {
     'Ip': {'name': 'SMAG_IP', 'unit': 'kA', 'label': 'Plasma current'},
     'Vloop': {'name': None, 'fun':'Vloop', 'unit': 'V', 'label': 'Loop voltage'},
     'Ohmic_P': {'name': None, 'fun':'Ohmic_power', 'unit':'MW', 'label':'Ohmic Power'},
+    'Separatrix_P': {'name':None, 'fun':'Separatrix_power', 'unit':'MW', 'label':'Power at separatrix'},
     'Te': {'name':None, 'fun':'Te', 'unit':'eV', 'label':'Te Central' },
     'Rext_upper': {'name': 'GMAG_TEST%1', 'unit': 'mm', 'label': 'Rext upper'},  # Rext upper
     'Rext_median': {'name': 'GMAG_TEST%2', 'unit': 'mm', 'label': 'Rext median', 'options':{'ylim':(2900, 2950)}},  # Rext median
@@ -812,7 +813,22 @@ def Vloop(pulse):
     return V_smooth, t
 
 def Ohmic_power(pulse):
-    V, t = Vloop(pulse) # V
-    Ip, t = get_sig(pulse, signals['Ip'])  # kA
-    P = V * np.squeeze(Ip) / 1e3  # MW
-    return P, t
+    V, t_V = Vloop(pulse) # V
+    Ip, t_Ip = get_sig(pulse, signals['Ip'])  # kA
+    # interpolate signals
+    _Ip = np.squeeze(np.interp(t_V, t_Ip, np.squeeze(Ip)))
+    P = V * _Ip / 1e3  # MW
+    return P, t_V
+
+def Separatrix_power(pulse):
+    P_Ohm, t_P_Ohm = get_sig(pulse, signals['Ohmic_P'])
+    P_LH, t_LH = get_sig(pulse, signals['LH_P_tot'])
+    P_IC, t_IC = get_sig(pulse, signals['IC_P_tot'])
+    P_rad_b, t_Prad_b = get_sig(pulse, signals['Prad_bulk'])
+
+    t = t_P_Ohm
+    _P_LH = np.interp(t, t_LH, P_LH.squeeze())
+    _P_IC = np.interp(t, t_IC, P_IC.squeeze()) * 1e-3 # kW -> MW
+    _P_rad_b = np.interp(t, t_Prad_b, P_rad_b.squeeze())
+
+    return P_Ohm + _P_LH + _P_IC - _P_rad_b, t
