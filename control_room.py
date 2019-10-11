@@ -11,7 +11,8 @@ signals = {
     'Datetime': {'name': None, 'fun': 'pulse_datetime', 'unit':'', 'label':'pulse datetime'},
     ## Magnetics
     'Ip': {'name': 'SMAG_IP', 'unit': 'kA', 'label': 'Plasma current'},
-    'Vloop': {'name': 'GMAG_VLOOP%1', 'unit': 'V', 'label': 'Loop voltage'},
+    'Vloop': {'name': None, 'fun':'Vloop', 'unit': 'V', 'label': 'Loop voltage'},
+    'Ohmic_P': {'name': None, 'fun':'Ohmic_power', 'unit':'MW', 'label':'Ohmic Power'},
     'Te': {'name':None, 'fun':'Te', 'unit':'eV', 'label':'Te Central' },
     'Rext_upper': {'name': 'GMAG_TEST%1', 'unit': 'mm', 'label': 'Rext upper'},  # Rext upper
     'Rext_median': {'name': 'GMAG_TEST%2', 'unit': 'mm', 'label': 'Rext median', 'options':{'ylim':(2900, 2950)}},  # Rext median
@@ -802,3 +803,16 @@ def Dext_LH1(pulse):
     return Dext(pulse, antenna='LH1')
 def Dext_LH2(pulse):
     return Dext(pulse, antenna='LH2')
+
+def Vloop(pulse):
+    # best flux loop among the 17 available
+    V, t = pw.tsbase(pulse, 'GMAG_VLOOP%4', nargout=2)
+    # smoothing the result
+    V_smooth = smooth(V)
+    return V_smooth, t
+
+def Ohmic_power(pulse):
+    V, t = Vloop(pulse) # V
+    Ip, t = get_sig(pulse, signals['Ip'])  # kA
+    P = V * np.squeeze(Ip) / 1e3  # MW
+    return P, t
