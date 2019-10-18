@@ -1,4 +1,4 @@
-|# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 
 """
@@ -57,7 +57,7 @@ def generate_sig_capas_Qi(i=1):
     return sig_probes_Qi
 
 #%%
-pulses = [55358]
+pulses = [55551]
 
 #%%
 sig_phases = [
@@ -174,14 +174,14 @@ axes[0].legend()
 sig_general = [
 #        signals['Ip'],
         signals['nl'],
-        signals['Te1'],
-        signals['Prad'],
-#        [signals['Neutron1'], signals['Neutron2']],
+        signals['Te'],
+        [signals['Prad'], signals['Separatrix_P']],
+        [signals['Neutron1'], signals['Neutron2']],
 #        [signals['Rext_median']],
         [signals['Dext_Q4']],
         #signals['Zgeo'],
         #signals['IC_P_tot'],#[signals['LH_P_LH1'], signals['LH_P_LH2']],
-#        signals['LH_P_tot'],
+        signals['LH_P_tot'],
         signals['IC_P_tot'],
         [signals['IC_P_Q1'], signals['IC_P_Q2'], signals['IC_P_Q4']],
 #        [signals['IC_Rc_Q1_left'], signals['IC_Rc_Q2_left'], signals['IC_Rc_Q4_left']],
@@ -294,5 +294,6 @@ sigs_phase = [
     signals['IC_Phase_Q1 (V3 - Pf_Right)'],
     signals['IC_Phase_Q1 (V4 - Pf_Right)'],
         ]
-fig, axes = scope([54902], sigs_phase, do_smooth=False, lw=2, cycling_mode='color')
+fig, axes = scope(pulses, sigs_phase, do_smooth=False, lw=2, cycling_mode='color')
+
 

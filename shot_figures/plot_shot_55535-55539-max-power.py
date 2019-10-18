@@ -15,12 +15,12 @@ from matplotlib.pyplot import *
 #%%
 pulse = 55535
 # pulse = 55539
-# pulse = 55507
+# pulse = 55528
 
 #%%
 Ip, t_Ip = get_sig(pulse, signals['Ip'])
 nl, t_nl = get_sig(pulse, signals['nl'])
-# Te, t_Te = get_sig(pulse, signals['Te'])
+
 
 P_IC_tot, t_tot = get_sig(pulse, signals['IC_P_tot'])
 P_Q1, t_Q1 = get_sig(pulse, signals['IC_P_Q1'])
@@ -31,7 +31,7 @@ Prad, trad = get_sig(pulse, signals['Prad'])
 Psep, tsep = get_sig(pulse, signals['Separatrix_P'])
 
 #%%
-Te, t_Te = get_sig(pulse, signals['Te1'])
+# Te, t_Te = get_sig(pulse, signals['Te'])
 neutron1, t_neutron1 = get_sig(pulse, signals['Neutron1'])
 
 #%%
@@ -58,12 +58,12 @@ ax[0].plot(t_Ip, Ip, lw=2)
 ax[0].set_ylabel('Ip [kA]', fontsize=14, color='C0')
 ax[0].tick_params(color='C0', labelcolor='C0')
 ax[0].set_xlim(-0.1, 13)
-ax[0].set_title(f'WEST #{pulse}', fontsize=14)
+ax[0].set_title(f'WEST #{pulse} - Preliminary', fontsize=14)
 
-ax2 = ax[0].twinx()
-ax2.plot(t_nl, nl, lw=2, color='C1')
-ax2.set_ylabel('nl [$10^{19}$ $m^{-3}$]', fontsize=14, color='C1')
-ax2.tick_params(color='C1', labelcolor='C1')
+ax0 = ax[0].twinx()
+ax0.plot(t_nl, nl, lw=2, color='C1')
+ax0.set_ylabel('nl [$10^{19}$ $m^{-3}$]', fontsize=14, color='C1')
+ax0.tick_params(color='C1', labelcolor='C1')
 
 ax[1].fill_between(t_Q4, (P_Q1+P_Q2+P_Q4)*1e-3 + _P_LH_tot, alpha=0.2, label='Total RF Power')
 ax[1].plot(t_LH1, P_LH1*1e-3, label='LH1', lw=2, color='C1')
@@ -78,17 +78,15 @@ ax[1].legend(fontsize=12, loc='upper left', ncol=2)
 
 ax[2].plot(trad, Prad, lw=2, label='Radiated (total)')
 ax[2].plot(tsep, Psep, lw=2, label='Separatrix')
-
 ax[2].set_ylim(0, 5)
 ax[2].set_ylabel('Power [MW]', fontsize=14)
 ax[2].legend(fontsize=12, loc='upper left')
 
-# ax[3].plot(t_Te, Te, lw=2)
-# ax3 = ax[3].twinx()
-# ax3.plot(t_neutron1, neutron1, lw=2, color='C1')
-# ax[3].set_ylabel('Te [eV]', fontsize=14, color='C0')
-# ax3.set_ylabel('Neutron [/s]', fontsize=14, color='C1')
-# ax3.set_ylim(10, 13)
+# ax2 = ax[2].twinx()
+# ax2.plot(t_Te, Te, lw=2, color='C2')
+# ax2.set_ylabel('Te [eV]', fontsize=14, color='C2')
+# ax2.set_ylim(bottom=0)
+# ax2.tick_params(color='C2', labelcolor='C2')
 
 [a.grid(True, alpha=0.2) for a in ax]
 [a.tick_params(labelsize=14) for a in ax]

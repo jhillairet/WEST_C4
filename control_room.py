@@ -3,6 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pywed as pw
 import pandas as pd
+import paramiko
+import os
+import json
 from itertools import cycle
 from scipy.io import loadmat
 
@@ -41,6 +44,8 @@ signals = {
     'Valve10': {'name': 'GDEBIT%10', 'unit': '$Pa.m^3/s$', 'label': 'Valve#10 (Q2)'},
     'Valve11': {'name': 'GDEBIT%11', 'unit': '$Pa.m^3/s$', 'label': 'Valve#11 (up.divertor)'},
     'Valve21': {'name': 'GDEBIT%21', 'unit': '$Pa.m^3/s$', 'label': 'Valve#21'},
+    ## RF
+    'RF_P_tot': {'name':None, 'fun':'RF_P_tot', 'unit':'MW', 'label':'Total RF Power'},
     ## ICRH
     # IC coupled powers
     'IC_P_tot': {'name': 'SICHPTOT', 'unit': 'kW', 'label': 'IC total coupled power'},
@@ -622,7 +627,7 @@ def scope(pulses, signames,
     with plt.style.context(style_label):
     
         t_fin_acq = []
-        fig, axes = plt.subplots(len(signames), 1, sharex=True, figsize=(7, 10))
+        fig, axes = plt.subplots(len(signames), 1, sharex=True, figsize=(7, 9))
         # move the figure 
         fig.canvas.manager.window.move(window_loc[0], window_loc[1])
         # cycle the color for each shot number
@@ -755,10 +760,6 @@ def Prad_bulk_imas(pulse):
     bolo = imas_west.get(pulse, 'bolometer')
     return bolo.power_radiated_inside_lcfs/1e6, bolo.time - tignitron(pulse)[0]
 
-@imas
-def Te(pulse):
-    ece = imas_west.get(pulse, 'ece')
-    return ece.t_e_central.data, ece.time - tignitron(pulse)[0]
 
 @imas
 def Rext_median_nice(pulse):
@@ -813,6 +814,13 @@ def Vloop(pulse):
     V_smooth = smooth(V)
     return V_smooth, t
 
+def RF_P_tot(pulse):
+    P_LH_tot, t_LH_tot = get_sig(pulse, signals['LH_P_tot'])
+    P_IC_tot, t_tot = get_sig(pulse, signals['IC_P_tot'])
+    # interpolate LH data on IC data
+    _P_LH_tot = np.interp(t_tot, t_LH_tot, P_LH_tot)
+    return _P_LH_tot + P_IC_tot*1e-3, t_tot
+
 def Ohmic_power(pulse):
     V, t_V = Vloop(pulse) # V
     Ip, t_Ip = get_sig(pulse, signals['Ip'])  # kA
@@ -846,3 +854,140 @@ def Separatrix_power(pulse):
     _P_rad_b = np.interp(t, t_Prad_b, P_rad_b.squeeze())
 
     return P_Ohm + _P_LH + _P_IC - _P_rad_b, t
+
+
+
+
+
+
+#%%
+def imas_get_remote(pulse, ids_name='ece',
+                    paths=['t_e_central.data', 'time'],
+                    imas_obj_fname='tmp_imas_data.npz'):
+    """
+    Get a WEST IMAS data for a given IMAS IDS and paths
+
+    Parameters
+    ----------
+    pulse : int
+        WEST pulse number
+    ids_name : str, optional
+        IMAS IDS name. The default is 'ece'.
+    paths : list, optional
+        list of IMAS IDS path to retrieve. Default is paths=['t_e_central.data', 'time']
+    imas_obj_fname : str, optional
+        Temporary name for file exchange. The default is 'tmp_imas_data.npz'.
+
+    Returns
+    -------
+    data : dict
+        Data corresponding to the order of the path dictionnary
+
+    """
+    # First need to set up SSH keys
+    privatekeyfile = os.path.expanduser('id_priv.rsa')
+    mykey = paramiko.RSAKey.from_private_key_file(privatekeyfile, password='HenS2008')
+
+    client = paramiko.SSHClient()
+    client.load_system_host_keys()
+    client.connect('talitha.intra.cea.fr', username='JH218595', pkey=mykey)
+
+    #%%
+    # Setup sftp connection and transmit this script
+    sftp = client.open_sftp()
+    sftp.put('C:/Users/JH218595/Documents/WEST_C4/save_from_imas.py', 'save_from_imas.py')
+
+    # Run the transmitted script remotely with args passed as json-like
+    #https://stackoverflow.com/questions/18006161/how-to-pass-dictionary-as-command-line-argument-to-python-script
+    cmd = 'module load tools_dc; python save_from_imas.py \'{"pulse":'+str(pulse)+\
+        ', "ids_name":"'+ids_name+\
+        '", "paths":'+json.dumps(paths)+'}\''
+
+    stdin, stdout, stderr = client.exec_command(cmd)
+    print(cmd)
+    # shows the output of the command
+    print('Error message:', stderr.read())
+    for line in stdout:
+        # Process each line in the remote output
+        print(line)
+
+    #%%
+    # Retrieve the IMAS object
+    print(f'Copying remote file {imas_obj_fname} locally....')
+    sftp.get(remotepath=f'/Home/JH218595/{imas_obj_fname}',
+             localpath=f'C:/Users/JH218595/Documents/WEST_C4/{imas_obj_fname}')
+    sftp.close()
+    
+    #%%
+    # close the SSH session
+    client.close()
+    
+    #%%
+    # test: open local file
+    data = np.load(imas_obj_fname, allow_pickle=True)
+
+    return data
+
+
+
+# @imas
+# def Te(pulse):
+#     ece = imas_west.get(pulse, 'ece')
+#     return ece.t_e_central.data, ece.time - tignitron(pulse)[0]
+
+def Te(pulse):
+    data = imas_get_remote(pulse, ids_name='ece',
+                           paths=['t_e_central.data', 'time'])
+    y = data['data'][0,:]
+    t = data['data'][1,:]
+    return y, t - tignitron(pulse)[0]
+
+
+
+def radiated_fraction(pulse):
+    """
+    Return the fraction of RF power radiated in percent. 
+
+    Also gives intermediate values used in the calculation.
+
+    Parameters
+    ----------
+    pulse : int
+        pulse number
+
+    Returns
+    -------
+    frac : float
+        Fraction of the RF Power Radiated in %
+    Prad_ohmic: float
+        Max Radiated Power during Ohmic Phase (prior RF) [MW]
+    Prad_RF: float
+        Max Radiated Power during RF Phase [MW]
+    PRF_max : float
+        Max RF Coupled Power [MW]
+
+    """
+    try:
+        P_RF, t_P_RF = get_sig(pulse, signals['RF_P_tot'])
+        Prad, t_Prad = get_sig(pulse, signals['Prad'])
+        # smoothing
+        P_RF = smooth(P_RF, window_length=101)
+        Prad = smooth(Prad, window_length=1001)
+        
+        # interpolate Prad on P_RF
+        Prad = np.interp(t_P_RF, t_Prad, Prad)
+        
+        # max radiated power during ohmic Phase
+        idx_ohmic = P_RF < 0.05
+        idx_RF = P_RF > 0.1
+        idx_start_RF = np.argmin(P_RF < 0.1)
+        Prad_ohmic = np.amax(Prad[:idx_start_RF])
+        
+        Prad_RF = np.amax(Prad[idx_RF])
+        PRF_max = np.amax(P_RF[idx_RF])
+        
+        frac = (Prad_RF - Prad_ohmic)/PRF_max * 100
+        print(f'{pulse}\t{Prad_ohmic}\t{Prad_RF}\t{PRF_max}\t{frac}')
+        return frac, Prad_ohmic, Prad_RF, PRF_max
+    except ValueError as e:
+        return np.NaN, np.NaN, np.NaN, np.NaN
