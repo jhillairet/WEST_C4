@@ -249,6 +249,8 @@ signals = {
     # Impurities (SURVIE)
     'Cu': {'name': 'scu19', 'unit': None, 'label': 'Copper'},
     'Fe': {'name': 'SFE15', 'unit': None, 'label': 'Iron'},
+    'Ag18': {'name': 'SAG18', 'unit':'a.u.', 'label':'Silver-18'},
+    'Ag19': {'name': 'SAG18', 'unit':'a.u.', 'label':'Silver-19'},
     ## Temperature
     'Te1': {'name': None, 'fun': 'ECE_1', 'unit': 'eV', 'label': 'Temperature (ECE)'},
     'Te2': {'name': None, 'fun': 'ECE_2', 'unit': 'eV', 'label': 'Temperature (ECE)'},
