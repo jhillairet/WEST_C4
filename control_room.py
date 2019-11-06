@@ -16,7 +16,7 @@ signals = {
     'Ip': {'name': 'SMAG_IP', 'unit': 'kA', 'label': 'Plasma current'},
     'Vloop': {'name': None, 'fun':'Vloop', 'unit': 'V', 'label': 'Loop voltage'},
     'Ohmic_P': {'name': None, 'fun':'Ohmic_power', 'unit':'MW', 'label':'Ohmic Power'},
-    'Separatrix_P': {'name':None, 'fun':'Separatrix_power', 'unit':'MW', 'label':'Power at separatrix'},
+    'Separatrix_P': {'name':None, 'fun':'Separatrix_power', 'unit':'MW', 'label':'Power at separatrix', 'options':{'ylim':(0, 5)}},
     'Te': {'name':None, 'fun':'Te', 'unit':'eV', 'label':'Te Central' },
     'Rext_upper': {'name': 'GMAG_TEST%1', 'unit': 'mm', 'label': 'Rext upper'},  # Rext upper
     'Rext_median': {'name': 'GMAG_TEST%2', 'unit': 'mm', 'label': 'Rext median', 'options':{'ylim':(2900, 2950)}},  # Rext median
@@ -30,8 +30,8 @@ signals = {
     'Zgeo': {'name': 'GMAG_BARY%2', 'unit': 'm', 'label': 'Zgeo'},  # Zgeo barycentre
     'R0': {'name': 'GMAG_BARY%1', 'unit': 'm', 'label': 'Large radius'},  # grand rayon
     'Ignitron': {'name' : None, 'fun': 'tignitron', 'unit': 's', 'label': 'Ignitron Time'},
-    'Neutron1': {'name': 'GFLUNTN%1', 'unit': 'N/s', 'label':'Neutron#1'},
-    'Neutron2': {'name': 'GFLUNTN%2', 'unit': 'N/s', 'label':'Neutron#2'},
+    'Neutron1': {'name': 'GFLUNTN%1', 'unit': 'N/s', 'label':'Neutron#1', 'options':{'ymin':10}},
+    'Neutron2': {'name': 'GFLUNTN%2', 'unit': 'N/s', 'label':'Neutron#2', 'options':{'ymin':10}},
     # Movable limiter position (LPA)
     'LPA': {'name': 'GMAG_POSLPA%1', 'unit': 'm', 'label': 'LPA'},
     ## Fueling
@@ -92,16 +92,16 @@ signals = {
     'IC_P_Q4_right_fwd': {'name': 'GICHANTPOWQ4%3', 'unit': 'kW', 'label': 'Right Fwd Power Q4'},
     'IC_P_Q4_right_ref': {'name': 'GICHANTPOWQ4%4', 'unit': 'kW', 'label': 'Right Ref Power Q4'},
     # IC Antennas coupling resistances
-    'IC_Rc_Q1_left': {'name': 'GICHCOUPRES%1', 'unit': 'Ohm', 'label': 'Rc - Q1 Left', 'options':{'ylim':(0,1.5)} },
-    'IC_Rc_Q1_right': {'name': 'GICHCOUPRES%2', 'unit': 'Ohm', 'label': 'Rc - Q1 Right', 'options':{'ylim':(0,1.5)}},
-    'IC_Rc_Q2_left': {'name': 'GICHCOUPRES%3', 'unit': 'Ohm', 'label': 'Rc - Q2 Left', 'options':{'ylim':(0,1.5)}},
-    'IC_Rc_Q2_right': {'name': 'GICHCOUPRES%4', 'unit': 'Ohm', 'label': 'Rc - Q2 Right','options':{'ylim':(0,1.5)}},
-    'IC_Rc_Q4_left': {'name': 'GICHCOUPRES%5', 'unit': 'Ohm', 'label': 'Rc - Q4 Left','options':{'ylim':(0,1.5)}},
-    'IC_Rc_Q4_right': {'name': 'GICHCOUPRES%6', 'unit': 'Ohm', 'label': 'Rc - Q4 Right', 'options':{'ylim':(0,1.5)}},
-    'IC_Rc_Q1_avg': {'name': None, 'fun': 'IC_Rc_Q1_avg', 'unit': 'Ohm', 'label': 'Avg. Rc - Q1', 'options':{'ylim':(0,1.5)}},
-    'IC_Rc_Q2_avg': {'name': None, 'fun': 'IC_Rc_Q2_avg', 'unit': 'Ohm', 'label': 'Avg. Rc - Q2', 'options':{'ylim':(0,1.5)}},
-    'IC_Rc_Q4_avg': {'name': None, 'fun': 'IC_Rc_Q4_avg', 'unit': 'Ohm', 'label': 'Avg. Rc - Q4', 'options':{'ylim':(0,1.5)}},    
-    'IC_Rc_avg': {'name': None, 'fun': 'IC_Rc_avg', 'unit': 'Ohm', 'label': 'Avg. IC Rc', 'options':{'ylim':(0,1.5)}},
+    'IC_Rc_Q1_left': {'name': 'GICHCOUPRES%1', 'unit': 'Ohm', 'label': 'Rc - Q1 Left', 'options':{'ylim':(0,2)} },
+    'IC_Rc_Q1_right': {'name': 'GICHCOUPRES%2', 'unit': 'Ohm', 'label': 'Rc - Q1 Right', 'options':{'ylim':(0,2)}},
+    'IC_Rc_Q2_left': {'name': 'GICHCOUPRES%3', 'unit': 'Ohm', 'label': 'Rc - Q2 Left', 'options':{'ylim':(0,2)}},
+    'IC_Rc_Q2_right': {'name': 'GICHCOUPRES%4', 'unit': 'Ohm', 'label': 'Rc - Q2 Right','options':{'ylim':(0,2)}},
+    'IC_Rc_Q4_left': {'name': 'GICHCOUPRES%5', 'unit': 'Ohm', 'label': 'Rc - Q4 Left','options':{'ylim':(0,2)}},
+    'IC_Rc_Q4_right': {'name': 'GICHCOUPRES%6', 'unit': 'Ohm', 'label': 'Rc - Q4 Right', 'options':{'ylim':(0,2)}},
+    'IC_Rc_Q1_avg': {'name': None, 'fun': 'IC_Rc_Q1_avg', 'unit': 'Ohm', 'label': 'Avg. Rc - Q1', 'options':{'ylim':(0,2)}},
+    'IC_Rc_Q2_avg': {'name': None, 'fun': 'IC_Rc_Q2_avg', 'unit': 'Ohm', 'label': 'Avg. Rc - Q2', 'options':{'ylim':(0,2)}},
+    'IC_Rc_Q4_avg': {'name': None, 'fun': 'IC_Rc_Q4_avg', 'unit': 'Ohm', 'label': 'Avg. Rc - Q4', 'options':{'ylim':(0,2)}},    
+    'IC_Rc_avg': {'name': None, 'fun': 'IC_Rc_avg', 'unit': 'Ohm', 'label': 'Avg. IC Rc', 'options':{'ylim':(0,2)}},
     # IC VSWR
     'IC_VSWR_Q1_Left': {'name':None, 'fun':'VSWR_Q1_Left', 'unit': '', 'label':'VSWR Q1 Left', 'options':{'ylim':(1, 3)}},
     'IC_VSWR_Q1_Right': {'name':None, 'fun':'VSWR_Q1_Right', 'unit': '', 'label':'VSWR Q1 Right', 'options':{'ylim':(1, 3)}},
