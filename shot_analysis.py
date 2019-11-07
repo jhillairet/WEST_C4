@@ -11,7 +11,7 @@ def generate_sig_generalQi(i=1):
     sigs_general_Qi = [
         signals[f'IC_PCS_interdiction_Q{i}'],
         signals[f'IC_PCS_Power_Q{i}'], 
-        #signals[f'IC_P_Q{i}'],
+        signals[f'IC_P_Q{i}'],
         [signals[f'IC_P_Q{i}_left_fwd'], signals[f'IC_P_Q{i}_left_ref']],
         [signals[f'IC_P_Q{i}_right_fwd'], signals[f'IC_P_Q{i}_right_ref']],
         [signals[f'IC_VSWR_Q{i}_Left'], signals[f'IC_VSWR_Q{i}_Right']],
@@ -57,11 +57,27 @@ def generate_sig_capas_Qi(i=1):
     return sig_probes_Qi
 
 #%%
-pulses = [55564]
+pulses = [55803]
+
+#%%
+sig_generalQ1 = generate_sig_generalQi(1)
+fig, axes = scope(pulses, sig_generalQ1, do_smooth=False, cycling_mode='ls')
+#axes[-1].set_xlim(3.5, 6.5)
+axes[0].legend()
+
+sig_generalQ2 = generate_sig_generalQi(2)
+fig, axes = scope(pulses, sig_generalQ2, do_smooth=False, window_loc=(600,0), cycling_mode='ls')
+#axes[-1].set_xlim(3.5, 6.5)
+axes[0].legend()
+
+sig_generalQ4 = generate_sig_generalQi(4)
+fig, axes = scope(pulses, sig_generalQ4, do_smooth=False, window_loc=(1200,0), cycling_mode='ls')
+#axes[-1].set_xlim(3.5, 6.5)
+axes[0].legend()
 
 #%% General view and Gaz
 sig_general = [
-#        signals['Ip'],
+        signals['Ip'],
         signals['nl'],
 #        signals['Te'],
         [signals['Prad'], signals['Separatrix_P']],
@@ -70,18 +86,17 @@ sig_general = [
         [signals['Dext_Q4']],
         #signals['Zgeo'],
         #signals['IC_P_tot'],#[signals['LH_P_LH1'], signals['LH_P_LH2']],
-#        signals['LH_P_tot'],
-#        signals['IC_P_tot'],
+        signals['LH_P_tot'],
+        signals['IC_P_tot'],
         [signals['IC_P_Q1'], signals['IC_P_Q2'], signals['IC_P_Q4']],
 #        [signals['IC_Rc_Q1_left'], signals['IC_Rc_Q2_left'], signals['IC_Rc_Q4_left']],
 #        [signals['IC_Rc_Q1_right'], signals['IC_Rc_Q2_right'], signals['IC_Rc_Q4_right']],
         [signals['IC_Rc_Q1_avg'], signals['IC_Rc_Q2_avg'], signals['IC_Rc_Q4_avg']],
 #        [signals['Valve11'], ],
         #[signals[f'IC_Vacuum_Q1_right'], signals[f'IC_Vacuum_Q2_right'], signals[f'IC_Vacuum_Q4_right'] ],
-#        signals['Cu'], 
-#        [signals['Ag18'], signals['Ag19']],
+        [signals['Ag18'], signals['Ag19'], signals['Cu'], signals['Fe'] ],
         ]
-fig, axes = scope(pulses, sig_general, do_smooth=False, window_loc=(600,0), cycling_mode='color')
+fig, axes = scope(pulses, sig_general, do_smooth=False, window_loc=(600,0), cycling_mode='ls')
 #axes[-1].set_xlim(3.5, 6.5)
 axes[0].legend()
 
@@ -145,21 +160,7 @@ axes[0].legend()
 #    val.append(np.round(mean))
 #print(val)
 
-#%%
-sig_generalQ1 = generate_sig_generalQi(1)
-fig, axes = scope(pulses, sig_generalQ1, do_smooth=False, cycling_mode='color')
-#axes[-1].set_xlim(3.5, 6.5)
-axes[0].legend()
 
-sig_generalQ2 = generate_sig_generalQi(2)
-fig, axes = scope(pulses, sig_generalQ2, do_smooth=False, window_loc=(600,0), cycling_mode='color')
-#axes[-1].set_xlim(3.5, 6.5)
-axes[0].legend()
-
-sig_generalQ4 = generate_sig_generalQi(4)
-fig, axes = scope(pulses, sig_generalQ4, do_smooth=False, window_loc=(1200,0), cycling_mode='color')
-#axes[-1].set_xlim(3.5, 6.5)
-axes[0].legend()
 
 
 #%%

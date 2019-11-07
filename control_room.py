@@ -358,13 +358,13 @@ def IC_Errors(pulse):
 
 
 def IC_Rc_Q1_avg(pulse):
-    #Q1RcLeft,  t_Q1RcLeft  = pw.tsbase(pulse, 'GICHCOUPRES%1', nargout=2)
+    Q1RcLeft,  t_Q1RcLeft  = pw.tsbase(pulse, 'GICHCOUPRES%1', nargout=2)
     Q1RcRight, t_Q1RcRight = pw.tsbase(pulse, 'GICHCOUPRES%2', nargout=2)
     # clean non physical values
-    #Q1RcLeft = np.where((Q1RcLeft < 3) & (Q1RcLeft > 0), Q1RcLeft, np.nan)
+    Q1RcLeft = np.where((Q1RcLeft < 3) & (Q1RcLeft > 0), Q1RcLeft, np.nan)
     Q1RcRight= np.where((Q1RcRight < 3) & (Q1RcRight > 0), Q1RcRight, np.nan)
     # averages
-    #IC_Rc_Q1 = np.nanmean([Q1RcLeft, Q1RcRight], axis=0)
+    IC_Rc_Q1 = np.nanmean([Q1RcLeft, Q1RcRight], axis=0)
     #return IC_Rc_Q1, t_Q1RcLeft
     return Q1RcRight, t_Q1RcRight
 
