@@ -88,9 +88,11 @@ class PulseDB():
                 # do not rewrite if allready exist
                 sig_path = f'{pulse}/{sig_name}'
                 if (sig_path not in f) or force_rewrite:
-                    y, t = get_sig(pulse, signals[sig_name])
                     print(f'Getting {sig_name} for #{pulse}')
-
+                    y, t = get_sig(pulse, signals[sig_name])
+                    if pulse == 54719:
+                        print(y)
+                    # store y,t in the database
                     if sig_path+"/y" in f:
                         f[sig_path+"/y"][...] = y
                     else:

@@ -12,6 +12,9 @@ from scipy.io import loadmat
 signals = {
     ## Shot properties
     'Datetime': {'name': None, 'fun': 'pulse_datetime', 'unit':'', 'label':'pulse datetime'},
+    'year': {'name':None, 'fun': 'pulse_year', 'unit':'', 'label': 'pulse year'},
+    'month': {'name':None, 'fun': 'pulse_month', 'unit':'', 'label': 'pulse month'},
+    'day': {'name':None, 'fun': 'pulse_day', 'unit':'', 'label': 'pulse day'},
     ## Magnetics
     'Ip': {'name': 'SMAG_IP', 'unit': 'kA', 'label': 'Plasma current'},
     'Vloop': {'name': None, 'fun':'Vloop', 'unit': 'V', 'label': 'Loop voltage'},
@@ -79,60 +82,67 @@ signals = {
     # FPGA temperatures
     'IC_FPGA_Temperatures': {'name': None, 'fun': 'IC_FPGA_Temperatures', 'unit': 'degC', 'label': 'IC FPGA Card Temperatures'},
     # IC antennas left and right forward and reflected powers
-    'IC_P_Q1_left_fwd': {'name': 'GICHANTPOWQ1%1', 'unit': 'kW', 'label': 'Left Fwd Power Q1'},
-    'IC_P_Q1_left_ref': {'name': 'GICHANTPOWQ1%2', 'unit': 'kW', 'label': 'Left Ref Power Q1'},
-    'IC_P_Q1_right_fwd': {'name': 'GICHANTPOWQ1%3',  'unit': 'kW', 'label': 'Right Fwd Power Q1'},
-    'IC_P_Q1_right_ref': {'name': 'GICHANTPOWQ1%4', 'unit': 'kW', 'label': 'Right Ref Power Q1'},
-    'IC_P_Q2_left_fwd': {'name': 'GICHANTPOWQ2%1', 'unit': 'kW', 'label': 'Left Fwd Power Q2'},
-    'IC_P_Q2_left_ref': {'name': 'GICHANTPOWQ2%2', 'unit': 'kW', 'label': 'Left Ref Power Q2'},
-    'IC_P_Q2_right_fwd': {'name': 'GICHANTPOWQ2%3', 'unit': 'kW', 'label': 'Right Fwd Power Q2'},
-    'IC_P_Q2_right_ref': {'name': 'GICHANTPOWQ2%4', 'unit': 'kW', 'label': 'Right Ref Power Q2'},    
-    'IC_P_Q4_left_fwd': {'name': 'GICHANTPOWQ4%1', 'unit': 'kW', 'label': 'Left Fwd Power Q4'},
-    'IC_P_Q4_left_ref': {'name': 'GICHANTPOWQ4%2', 'unit': 'kW', 'label': 'Left Ref Power Q4'},
-    'IC_P_Q4_right_fwd': {'name': 'GICHANTPOWQ4%3', 'unit': 'kW', 'label': 'Right Fwd Power Q4'},
-    'IC_P_Q4_right_ref': {'name': 'GICHANTPOWQ4%4', 'unit': 'kW', 'label': 'Right Ref Power Q4'},
+    'IC_P_Q1_left_fwd': {'name': 'GICHANTPOWQ1%1', 'unit': 'kW', 'label': 'left Fwd Power Q1'},
+    'IC_P_Q1_left_ref': {'name': 'GICHANTPOWQ1%2', 'unit': 'kW', 'label': 'left Ref Power Q1'},
+    'IC_P_Q1_right_fwd': {'name': 'GICHANTPOWQ1%3',  'unit': 'kW', 'label': 'right Fwd Power Q1'},
+    'IC_P_Q1_right_ref': {'name': 'GICHANTPOWQ1%4', 'unit': 'kW', 'label': 'right Ref Power Q1'},
+    'IC_P_Q2_left_fwd': {'name': 'GICHANTPOWQ2%1', 'unit': 'kW', 'label': 'left Fwd Power Q2'},
+    'IC_P_Q2_left_ref': {'name': 'GICHANTPOWQ2%2', 'unit': 'kW', 'label': 'left Ref Power Q2'},
+    'IC_P_Q2_right_fwd': {'name': 'GICHANTPOWQ2%3', 'unit': 'kW', 'label': 'right Fwd Power Q2'},
+    'IC_P_Q2_right_ref': {'name': 'GICHANTPOWQ2%4', 'unit': 'kW', 'label': 'right Ref Power Q2'},    
+    'IC_P_Q4_left_fwd': {'name': 'GICHANTPOWQ4%1', 'unit': 'kW', 'label': 'left Fwd Power Q4'},
+    'IC_P_Q4_left_ref': {'name': 'GICHANTPOWQ4%2', 'unit': 'kW', 'label': 'left Ref Power Q4'},
+    'IC_P_Q4_right_fwd': {'name': 'GICHANTPOWQ4%3', 'unit': 'kW', 'label': 'right Fwd Power Q4'},
+    'IC_P_Q4_right_ref': {'name': 'GICHANTPOWQ4%4', 'unit': 'kW', 'label': 'right Ref Power Q4'},
     # IC Antennas coupling resistances
-    'IC_Rc_Q1_left': {'name': 'GICHCOUPRES%1', 'unit': 'Ohm', 'label': 'Rc - Q1 Left', 'options':{'ylim':(0,2)} },
-    'IC_Rc_Q1_right': {'name': 'GICHCOUPRES%2', 'unit': 'Ohm', 'label': 'Rc - Q1 Right', 'options':{'ylim':(0,2)}},
-    'IC_Rc_Q2_left': {'name': 'GICHCOUPRES%3', 'unit': 'Ohm', 'label': 'Rc - Q2 Left', 'options':{'ylim':(0,2)}},
-    'IC_Rc_Q2_right': {'name': 'GICHCOUPRES%4', 'unit': 'Ohm', 'label': 'Rc - Q2 Right','options':{'ylim':(0,2)}},
-    'IC_Rc_Q4_left': {'name': 'GICHCOUPRES%5', 'unit': 'Ohm', 'label': 'Rc - Q4 Left','options':{'ylim':(0,2)}},
-    'IC_Rc_Q4_right': {'name': 'GICHCOUPRES%6', 'unit': 'Ohm', 'label': 'Rc - Q4 Right', 'options':{'ylim':(0,2)}},
+    'IC_Rc_Q1_left': {'name': 'GICHCOUPRES%1', 'unit': 'Ohm', 'label': 'Rc - Q1 left', 'options':{'ylim':(0,2)} },
+    'IC_Rc_Q1_right': {'name': 'GICHCOUPRES%2', 'unit': 'Ohm', 'label': 'Rc - Q1 right', 'options':{'ylim':(0,2)}},
+    'IC_Rc_Q2_left': {'name': 'GICHCOUPRES%3', 'unit': 'Ohm', 'label': 'Rc - Q2 left', 'options':{'ylim':(0,2)}},
+    'IC_Rc_Q2_right': {'name': 'GICHCOUPRES%4', 'unit': 'Ohm', 'label': 'Rc - Q2 right','options':{'ylim':(0,2)}},
+    'IC_Rc_Q4_left': {'name': 'GICHCOUPRES%5', 'unit': 'Ohm', 'label': 'Rc - Q4 left','options':{'ylim':(0,2)}},
+    'IC_Rc_Q4_right': {'name': 'GICHCOUPRES%6', 'unit': 'Ohm', 'label': 'Rc - Q4 right', 'options':{'ylim':(0,2)}},
     'IC_Rc_Q1_avg': {'name': None, 'fun': 'IC_Rc_Q1_avg', 'unit': 'Ohm', 'label': 'Avg. Rc - Q1', 'options':{'ylim':(0,2)}},
     'IC_Rc_Q2_avg': {'name': None, 'fun': 'IC_Rc_Q2_avg', 'unit': 'Ohm', 'label': 'Avg. Rc - Q2', 'options':{'ylim':(0,2)}},
     'IC_Rc_Q4_avg': {'name': None, 'fun': 'IC_Rc_Q4_avg', 'unit': 'Ohm', 'label': 'Avg. Rc - Q4', 'options':{'ylim':(0,2)}},    
     'IC_Rc_avg': {'name': None, 'fun': 'IC_Rc_avg', 'unit': 'Ohm', 'label': 'Avg. IC Rc', 'options':{'ylim':(0,2)}},
+    # IC Voltage reflected coefficient at bidirectional coupler
+    'IC_Gamma_Q1_left' : {'name':None, 'fun': 'IC_Gamma_Q1_left', 'unit':'', 'label':'Voltage Reflection Coefficient Q1 left'},
+    'IC_Gamma_Q1_right' : {'name':None, 'fun': 'IC_Gamma_Q1_right', 'unit':'', 'label':'Voltage Reflection Coefficient Q1 right'},
+    'IC_Gamma_Q2_left' : {'name':None, 'fun': 'IC_Gamma_Q2_left', 'unit':'', 'label':'Voltage Reflection Coefficient Q2 left'},
+    'IC_Gamma_Q2_right' : {'name':None, 'fun': 'IC_Gamma_Q2_right', 'unit':'', 'label':'Voltage Reflection Coefficient Q2 right'},
+    'IC_Gamma_Q4_left' : {'name':None, 'fun': 'IC_Gamma_Q4_left', 'unit':'', 'label':'Voltage Reflection Coefficient Q4 left'},
+    'IC_Gamma_Q4_right' : {'name':None, 'fun': 'IC_Gamma_Q4_right', 'unit':'', 'label':'Voltage Reflection Coefficient Q4 left'},    
     # IC VSWR
-    'IC_VSWR_Q1_Left': {'name':None, 'fun':'VSWR_Q1_Left', 'unit': '', 'label':'VSWR Q1 Left', 'options':{'ylim':(1, 3)}},
-    'IC_VSWR_Q1_Right': {'name':None, 'fun':'VSWR_Q1_Right', 'unit': '', 'label':'VSWR Q1 Right', 'options':{'ylim':(1, 3)}},
-    'IC_VSWR_Q2_Left': {'name':None, 'fun':'VSWR_Q2_Left', 'unit': '', 'label':'VSWR Q2 Left', 'options':{'ylim':(1, 3)}},
-    'IC_VSWR_Q2_Right': {'name':None, 'fun':'VSWR_Q2_Right', 'unit': '', 'label':'VSWR Q2 Right', 'options':{'ylim':(1, 3)}},
-    'IC_VSWR_Q4_Left': {'name':None, 'fun':'VSWR_Q4_Left', 'unit': '', 'label':'VSWR Q4 Left', 'options':{'ylim':(1, 3)}},
-    'IC_VSWR_Q4_Right': {'name':None, 'fun':'VSWR_Q4_Right', 'unit': '', 'label':'VSWR Q4 Right', 'options':{'ylim':(1, 3)}},    
+    'IC_VSWR_Q1_left': {'name':None, 'fun':'VSWR_Q1_left', 'unit': '', 'label':'VSWR Q1 left', 'options':{'ylim':(1, 3)}},
+    'IC_VSWR_Q1_right': {'name':None, 'fun':'VSWR_Q1_right', 'unit': '', 'label':'VSWR Q1 right', 'options':{'ylim':(1, 3)}},
+    'IC_VSWR_Q2_left': {'name':None, 'fun':'VSWR_Q2_left', 'unit': '', 'label':'VSWR Q2 left', 'options':{'ylim':(1, 3)}},
+    'IC_VSWR_Q2_right': {'name':None, 'fun':'VSWR_Q2_right', 'unit': '', 'label':'VSWR Q2 right', 'options':{'ylim':(1, 3)}},
+    'IC_VSWR_Q4_left': {'name':None, 'fun':'VSWR_Q4_left', 'unit': '', 'label':'VSWR Q4 left', 'options':{'ylim':(1, 3)}},
+    'IC_VSWR_Q4_right': {'name':None, 'fun':'VSWR_Q4_right', 'unit': '', 'label':'VSWR Q4 right', 'options':{'ylim':(1, 3)}},    
     # IC antennas phase Q1
-    'IC_Phase_Q1 (Pf_Left - Pf_Right)': {'name': 'GICHPHASESQ1%1', 'unit': 'deg', 'label': 'Phase (Pf left - Pf right) antenna Q1'},
-    'IC_Phase_Q1 (Pr_Left - Pf_Right)': {'name': 'GICHPHASESQ1%2', 'unit': 'deg', 'label': 'Phase (Pr left - Pf right) antenna Q1'},
-    'IC_Phase_Q1 (Pr_Right - Pf_Right)': {'name': 'GICHPHASESQ1%3', 'unit': 'deg', 'label': 'Phase (Pr right - Pf right) antenna Q1'},
-    'IC_Phase_Q1 (V1 - Pf_Left)': {'name': 'GICHPHASESQ1%4', 'unit': 'deg', 'label': 'Phase (V1 - Pf left) antenna Q1'},
-    'IC_Phase_Q1 (V2 - Pf_Left)': {'name': 'GICHPHASESQ1%5', 'unit': 'deg', 'label': 'Phase (V2 - Pf left) antenna Q1'},
-    'IC_Phase_Q1 (V3 - Pf_Right)': {'name': 'GICHPHASESQ1%6', 'unit': 'deg', 'label': 'Phase (V3 - Pf right) antenna Q1'},
-    'IC_Phase_Q1 (V4 - Pf_Right)': {'name': 'GICHPHASESQ1%7', 'unit': 'deg', 'label': 'Phase (V4 - Pf right) antenna Q1'},
+    'IC_Phase_Q1 (Pf_left - Pf_right)': {'name': 'GICHPHASESQ1%1', 'unit': 'deg', 'label': 'Phase (Pf left - Pf right) antenna Q1'},
+    'IC_Phase_Q1 (Pr_left - Pf_right)': {'name': 'GICHPHASESQ1%2', 'unit': 'deg', 'label': 'Phase (Pr left - Pf right) antenna Q1'},
+    'IC_Phase_Q1 (Pr_right - Pf_right)': {'name': 'GICHPHASESQ1%3', 'unit': 'deg', 'label': 'Phase (Pr right - Pf right) antenna Q1'},
+    'IC_Phase_Q1 (V1 - Pf_left)': {'name': 'GICHPHASESQ1%4', 'unit': 'deg', 'label': 'Phase (V1 - Pf left) antenna Q1'},
+    'IC_Phase_Q1 (V2 - Pf_left)': {'name': 'GICHPHASESQ1%5', 'unit': 'deg', 'label': 'Phase (V2 - Pf left) antenna Q1'},
+    'IC_Phase_Q1 (V3 - Pf_right)': {'name': 'GICHPHASESQ1%6', 'unit': 'deg', 'label': 'Phase (V3 - Pf right) antenna Q1'},
+    'IC_Phase_Q1 (V4 - Pf_right)': {'name': 'GICHPHASESQ1%7', 'unit': 'deg', 'label': 'Phase (V4 - Pf right) antenna Q1'},
     # IC antennas phase Q2
-    'IC_Phase_Q2 (Pf_Left - Pf_Right)': {'name': 'GICHPHASESQ2%1', 'unit': 'deg', 'label': 'Phase (Pf left - Pf right) antenna Q2'},
-    'IC_Phase_Q2 (Pr_Left - Pf_Right)': {'name': 'GICHPHASESQ2%2', 'unit': 'deg', 'label': 'Phase (Pr left - Pf right) antenna Q2'},
-    'IC_Phase_Q2 (Pr_Right - Pf_Right)': {'name': 'GICHPHASESQ2%3', 'unit': 'deg', 'label': 'Phase (Pr right - Pf right) antenna Q2'},
-    'IC_Phase_Q2 (V1 - Pf_Left)': {'name': 'GICHPHASESQ2%4', 'unit': 'deg', 'label': 'Phase (V1 - Pf left) antenna Q2'},
-    'IC_Phase_Q2 (V2 - Pf_Left)': {'name': 'GICHPHASESQ2%5', 'unit': 'deg', 'label': 'Phase (V2 - Pf left) antenna Q2'},
-    'IC_Phase_Q2 (V3 - Pf_Right)': {'name': 'GICHPHASESQ2%6', 'unit': 'deg', 'label': 'Phase (V3 - Pf right) antenna Q2'},
-    'IC_Phase_Q2 (V4 - Pf_Right)': {'name': 'GICHPHASESQ2%7', 'unit': 'deg', 'label': 'Phase (V4 - Pf right) antenna Q2'},
+    'IC_Phase_Q2 (Pf_left - Pf_right)': {'name': 'GICHPHASESQ2%1', 'unit': 'deg', 'label': 'Phase (Pf left - Pf right) antenna Q2'},
+    'IC_Phase_Q2 (Pr_left - Pf_right)': {'name': 'GICHPHASESQ2%2', 'unit': 'deg', 'label': 'Phase (Pr left - Pf right) antenna Q2'},
+    'IC_Phase_Q2 (Pr_right - Pf_right)': {'name': 'GICHPHASESQ2%3', 'unit': 'deg', 'label': 'Phase (Pr right - Pf right) antenna Q2'},
+    'IC_Phase_Q2 (V1 - Pf_left)': {'name': 'GICHPHASESQ2%4', 'unit': 'deg', 'label': 'Phase (V1 - Pf left) antenna Q2'},
+    'IC_Phase_Q2 (V2 - Pf_left)': {'name': 'GICHPHASESQ2%5', 'unit': 'deg', 'label': 'Phase (V2 - Pf left) antenna Q2'},
+    'IC_Phase_Q2 (V3 - Pf_right)': {'name': 'GICHPHASESQ2%6', 'unit': 'deg', 'label': 'Phase (V3 - Pf right) antenna Q2'},
+    'IC_Phase_Q2 (V4 - Pf_right)': {'name': 'GICHPHASESQ2%7', 'unit': 'deg', 'label': 'Phase (V4 - Pf right) antenna Q2'},
     # IC antennas phase Q4
-    'IC_Phase_Q4 (Pf_Left - Pf_Right)': {'name': 'GICHPHASESQ4%1', 'unit': 'deg', 'label': 'Phase (Pf left - Pf right) antenna Q4'},
-    'IC_Phase_Q4 (Pr_Left - Pf_Right)': {'name': 'GICHPHASESQ4%2', 'unit': 'deg', 'label': 'Phase (Pr left - Pf right) antenna Q4'},
-    'IC_Phase_Q4 (Pr_Right - Pf_Right)': {'name': 'GICHPHASESQ4%3', 'unit': 'deg', 'label': 'Phase (Pr right - Pf right) antenna Q4'},
-    'IC_Phase_Q4 (V1 - Pf_Left)': {'name': 'GICHPHASESQ4%4', 'unit': 'deg', 'label': 'Phase (V1 - Pf left) antenna Q4'},
-    'IC_Phase_Q4 (V2 - Pf_Left)': {'name': 'GICHPHASESQ4%5', 'unit': 'deg', 'label': 'Phase (V2 - Pf left) antenna Q4'},
-    'IC_Phase_Q4 (V3 - Pf_Right)': {'name': 'GICHPHASESQ4%6', 'unit': 'deg', 'label': 'Phase (V3 - Pf right) antenna Q4'},
-    'IC_Phase_Q4 (V4 - Pf_Right)': {'name': 'GICHPHASESQ4%7', 'unit': 'deg', 'label': 'Phase (V4 - Pf right) antenna Q4'},
+    'IC_Phase_Q4 (Pf_left - Pf_right)': {'name': 'GICHPHASESQ4%1', 'unit': 'deg', 'label': 'Phase (Pf left - Pf right) antenna Q4'},
+    'IC_Phase_Q4 (Pr_left - Pf_right)': {'name': 'GICHPHASESQ4%2', 'unit': 'deg', 'label': 'Phase (Pr left - Pf right) antenna Q4'},
+    'IC_Phase_Q4 (Pr_right - Pf_right)': {'name': 'GICHPHASESQ4%3', 'unit': 'deg', 'label': 'Phase (Pr right - Pf right) antenna Q4'},
+    'IC_Phase_Q4 (V1 - Pf_left)': {'name': 'GICHPHASESQ4%4', 'unit': 'deg', 'label': 'Phase (V1 - Pf left) antenna Q4'},
+    'IC_Phase_Q4 (V2 - Pf_left)': {'name': 'GICHPHASESQ4%5', 'unit': 'deg', 'label': 'Phase (V2 - Pf left) antenna Q4'},
+    'IC_Phase_Q4 (V3 - Pf_right)': {'name': 'GICHPHASESQ4%6', 'unit': 'deg', 'label': 'Phase (V3 - Pf right) antenna Q4'},
+    'IC_Phase_Q4 (V4 - Pf_right)': {'name': 'GICHPHASESQ4%7', 'unit': 'deg', 'label': 'Phase (V4 - Pf right) antenna Q4'},
     # IC antenna phase differences
     'IC_delta_phi_toro_Q1_Top_LmR': {'name': None, 'fun': 'delta_phi_toro_Q1_Top_LmR', 'unit': 'deg', 'label': 'DeltaPhase Q1 (L - R) Top'},
     'IC_delta_phi_toro_Q2_Top_LmR': {'name': None, 'fun': 'delta_phi_toro_Q2_Top_LmR', 'unit': 'deg', 'label': 'DeltaPhase Q2 (L - R) Top'},
@@ -140,16 +150,20 @@ signals = {
     'IC_delta_phi_toro_Q1_Bot_LmR': {'name': None, 'fun': 'delta_phi_toro_Q1_Bot_LmR', 'unit': 'deg', 'label': 'DeltaPhase Q1 (L - R) Bot'},
     'IC_delta_phi_toro_Q2_Bot_LmR': {'name': None, 'fun': 'delta_phi_toro_Q2_Bot_LmR', 'unit': 'deg', 'label': 'DeltaPhase Q2 (L - R) Bot'},
     'IC_delta_phi_toro_Q4_Bot_LmR': {'name': None, 'fun': 'delta_phi_toro_Q4_Bot_LmR', 'unit': 'deg', 'label': 'DeltaPhase Q4 (L - R) Bot'},  
-    'IC_delta_phi_polo_Q1_Left_BmT': {'name':None, 'fun': 'delta_phi_polo_Q1_Left_BmT', 'unit': 'deg', 'label': 'DeltaPhase Q1 (B - T) Left'},
-    'IC_delta_phi_polo_Q2_Left_BmT': {'name':None, 'fun': 'delta_phi_polo_Q2_Left_BmT', 'unit': 'deg', 'label': 'DeltaPhase Q2 (B - T) Left'},
-    'IC_delta_phi_polo_Q4_Left_BmT': {'name':None, 'fun': 'delta_phi_polo_Q4_Left_BmT', 'unit': 'deg', 'label': 'DeltaPhase Q4 (B - T) Left'},
-    'IC_delta_phi_polo_Q1_Right_BmT': {'name':None, 'fun': 'delta_phi_polo_Q1_Right_BmT', 'unit': 'deg', 'label': 'DeltaPhase Q1 (B - T) Right'},
-    'IC_delta_phi_polo_Q2_Right_BmT': {'name':None, 'fun': 'delta_phi_polo_Q2_Right_BmT', 'unit': 'deg', 'label': 'DeltaPhase Q2 (B - T) Right'},
-    'IC_delta_phi_polo_Q4_Right_BmT': {'name':None, 'fun': 'delta_phi_polo_Q4_Right_BmT', 'unit': 'deg', 'label': 'DeltaPhase Q4 (B - T) Right'},    
+    'IC_delta_phi_polo_Q1_left_BmT': {'name':None, 'fun': 'delta_phi_polo_Q1_left_BmT', 'unit': 'deg', 'label': 'DeltaPhase Q1 (B - T) left'},
+    'IC_delta_phi_polo_Q2_left_BmT': {'name':None, 'fun': 'delta_phi_polo_Q2_left_BmT', 'unit': 'deg', 'label': 'DeltaPhase Q2 (B - T) left'},
+    'IC_delta_phi_polo_Q4_left_BmT': {'name':None, 'fun': 'delta_phi_polo_Q4_left_BmT', 'unit': 'deg', 'label': 'DeltaPhase Q4 (B - T) left'},
+    'IC_delta_phi_polo_Q1_right_BmT': {'name':None, 'fun': 'delta_phi_polo_Q1_right_BmT', 'unit': 'deg', 'label': 'DeltaPhase Q1 (B - T) right'},
+    'IC_delta_phi_polo_Q2_right_BmT': {'name':None, 'fun': 'delta_phi_polo_Q2_right_BmT', 'unit': 'deg', 'label': 'DeltaPhase Q2 (B - T) right'},
+    'IC_delta_phi_polo_Q4_right_BmT': {'name':None, 'fun': 'delta_phi_polo_Q4_right_BmT', 'unit': 'deg', 'label': 'DeltaPhase Q4 (B - T) right'},    
     # IC antenna phase differences calculated in FPGA direclty. Default is difference between top straps except Q1 -> bottom as V1 out of order
     'IC_delta_phi_toro_Q1_LmR_FPGA': {'name': 'SICHPHQ1', 'unit': 'deg', 'label':' DeltaPhase Q1 (L - R) FPGA'},
     'IC_delta_phi_toro_Q2_LmR_FPGA': {'name': 'SICHPHQ2', 'unit': 'deg', 'label':' DeltaPhase Q2 (L - R) FPGA'},
     'IC_delta_phi_toro_Q4_LmR_FPGA': {'name': 'SICHPHQ4', 'unit': 'deg', 'label':' DeltaPhase Q4 (L - R) FPGA'},
+    # convenient shortcut to toroidal phase without noise (Gives NaN when no power instead of noisy values)
+    'IC_Phase_Q1': {'name':None, 'fun':'phase_Q1', 'unit':'deg', 'label':'Tor.Phase Q1'},
+    'IC_Phase_Q2': {'name':None, 'fun':'phase_Q2', 'unit':'deg', 'label':'Tor.Phase Q2'},
+    'IC_Phase_Q4': {'name':None, 'fun':'phase_Q4', 'unit':'deg', 'label':'Tor.Phase Q4'},    
     # IC Antennas internal vacuum (y = 10**(1.5*y - 10))
     'IC_Vacuum_Q1_left': {'name': None, 'fun': 'IC_Q1_vacuum_left', 'unit': 'Pa', 'label': 'Vaccum Q1 left', 'options': {'yscale':'log', 'ylimit':4.5e-3, 'ylimit_low':2.2e-4}},
     'IC_Vacuum_Q1_right': {'name': None, 'fun': 'IC_Q1_vacuum_right', 'unit': 'Pa', 'label': 'Vaccum Q1 right', 'options': {'yscale':'log', 'ylimit':4.5e-3, 'ylimit_low':2.2e-4}},
@@ -199,45 +213,45 @@ signals = {
     'IC_ErrSig_Q4_right_upper': {'name': 'GICHSIGERR%11', 'unit': '', 'label': 'Err.Sig.Q4 R-U'},
     'IC_ErrSig_Q4_right_lower': {'name': 'GICHSIGERR%12', 'unit': '', 'label': 'Err.Sig.Q4 R-L'},    
     # IC antennas Capacitor Voltages
-    'IC_Voltage_left_upper_Q1': {'name': 'GICHVPROBEQ1%1', 'unit': 'kV', 'label': 'Left upper capacitor voltage Q1', 'options': {'ylimit':27}},
-    'IC_Voltage_left_lower_Q1': {'name': 'GICHVPROBEQ1%2', 'unit': 'kV', 'label': 'Left lower capacitor voltage Q1', 'options': {'ylimit':27}},
-    'IC_Voltage_right_upper_Q1': {'name': 'GICHVPROBEQ1%3', 'unit': 'kV', 'label': 'Right upper capacitor voltage Q1', 'options': {'ylimit':27}},
-    'IC_Voltage_right_lower_Q1': {'name': 'GICHVPROBEQ1%4', 'unit': 'kV', 'label': 'Right lower capacitor voltage Q1', 'options': {'ylimit':27}}, 
-    'IC_Voltage_left_upper_Q2': {'name': 'GICHVPROBEQ2%1', 'unit': 'kV', 'label': 'Left upper capacitor voltage Q2', 'options': {'ylimit':27}},
-    'IC_Voltage_left_lower_Q2': {'name': 'GICHVPROBEQ2%2', 'unit': 'kV', 'label': 'Left lower capacitor voltage Q2', 'options': {'ylimit':27}},
-    'IC_Voltage_right_upper_Q2': {'name': 'GICHVPROBEQ2%3', 'unit': 'kV', 'label': 'Right upper capacitor voltage Q2', 'options': {'ylimit':27}},
-    'IC_Voltage_right_lower_Q2': {'name': 'GICHVPROBEQ2%4', 'unit': 'kV', 'label': 'Right lower capacitor voltage Q2', 'options': {'ylimit':27}},
-    'IC_Voltage_left_upper_Q4': {'name': 'GICHVPROBEQ4%1', 'unit': 'kV', 'label': 'Left upper capacitor voltage Q4', 'options': {'ylimit':27}},
-    'IC_Voltage_left_lower_Q4': {'name': 'GICHVPROBEQ4%2', 'unit': 'kV', 'label': 'Left lower capacitor voltage Q4', 'options': {'ylimit':27}},
-    'IC_Voltage_right_upper_Q4': {'name': 'GICHVPROBEQ4%3', 'unit': 'kV', 'label': 'Right upper capacitor voltage Q4', 'options': {'ylimit':27}},
-    'IC_Voltage_right_lower_Q4': {'name': 'GICHVPROBEQ4%4', 'unit': 'kV', 'label': 'Right lower capacitor voltage Q4', 'options': {'ylimit':27}},
+    'IC_Voltage_left_upper_Q1': {'name': 'GICHVPROBEQ1%1', 'unit': 'kV', 'label': 'left upper capacitor voltage Q1', 'options': {'ylimit':27}},
+    'IC_Voltage_left_lower_Q1': {'name': 'GICHVPROBEQ1%2', 'unit': 'kV', 'label': 'left lower capacitor voltage Q1', 'options': {'ylimit':27}},
+    'IC_Voltage_right_upper_Q1': {'name': 'GICHVPROBEQ1%3', 'unit': 'kV', 'label': 'right upper capacitor voltage Q1', 'options': {'ylimit':27}},
+    'IC_Voltage_right_lower_Q1': {'name': 'GICHVPROBEQ1%4', 'unit': 'kV', 'label': 'right lower capacitor voltage Q1', 'options': {'ylimit':27}}, 
+    'IC_Voltage_left_upper_Q2': {'name': 'GICHVPROBEQ2%1', 'unit': 'kV', 'label': 'left upper capacitor voltage Q2', 'options': {'ylimit':27}},
+    'IC_Voltage_left_lower_Q2': {'name': 'GICHVPROBEQ2%2', 'unit': 'kV', 'label': 'left lower capacitor voltage Q2', 'options': {'ylimit':27}},
+    'IC_Voltage_right_upper_Q2': {'name': 'GICHVPROBEQ2%3', 'unit': 'kV', 'label': 'right upper capacitor voltage Q2', 'options': {'ylimit':27}},
+    'IC_Voltage_right_lower_Q2': {'name': 'GICHVPROBEQ2%4', 'unit': 'kV', 'label': 'right lower capacitor voltage Q2', 'options': {'ylimit':27}},
+    'IC_Voltage_left_upper_Q4': {'name': 'GICHVPROBEQ4%1', 'unit': 'kV', 'label': 'left upper capacitor voltage Q4', 'options': {'ylimit':27}},
+    'IC_Voltage_left_lower_Q4': {'name': 'GICHVPROBEQ4%2', 'unit': 'kV', 'label': 'left lower capacitor voltage Q4', 'options': {'ylimit':27}},
+    'IC_Voltage_right_upper_Q4': {'name': 'GICHVPROBEQ4%3', 'unit': 'kV', 'label': 'right upper capacitor voltage Q4', 'options': {'ylimit':27}},
+    'IC_Voltage_right_lower_Q4': {'name': 'GICHVPROBEQ4%4', 'unit': 'kV', 'label': 'right lower capacitor voltage Q4', 'options': {'ylimit':27}},
     # IC Maximum Voltage values
-    'IC_Voltage_left_max_Q1': {'name':None, 'fun':'IC_Voltage_left_max_Q1', 'unit':'kV', 'label': 'Left Maximum voltage Q1', 'options': {'ylimit':27}},
-    'IC_Voltage_right_max_Q1': {'name':None, 'fun':'IC_Voltage_right_max_Q1', 'unit':'kV', 'label': 'Right Maximum voltage Q1', 'options': {'ylimit':27}},
-    'IC_Voltage_left_max_Q2': {'name':None, 'fun':'IC_Voltage_left_max_Q2', 'unit':'kV', 'label': 'Left Maximum voltage Q2', 'options': {'ylimit':27}},
-    'IC_Voltage_right_max_Q2': {'name':None, 'fun':'IC_Voltage_right_max_Q2', 'unit':'kV', 'label': 'Right Maximum voltage Q2', 'options': {'ylimit':27}},
-    'IC_Voltage_left_max_Q4': {'name':None, 'fun':'IC_Voltage_left_max_Q4', 'unit':'kV', 'label': 'Left Maximum voltage Q4', 'options': {'ylimit':27}},
-    'IC_Voltage_right_max_Q4': {'name':None, 'fun':'IC_Voltage_right_max_Q4', 'unit':'kV', 'label': 'Right Maximum voltage Q4', 'options': {'ylimit':27}},
+    'IC_Voltage_left_max_Q1': {'name':None, 'fun':'IC_Voltage_left_max_Q1', 'unit':'kV', 'label': 'left Maximum voltage Q1', 'options': {'ylimit':27}},
+    'IC_Voltage_right_max_Q1': {'name':None, 'fun':'IC_Voltage_right_max_Q1', 'unit':'kV', 'label': 'right Maximum voltage Q1', 'options': {'ylimit':27}},
+    'IC_Voltage_left_max_Q2': {'name':None, 'fun':'IC_Voltage_left_max_Q2', 'unit':'kV', 'label': 'left Maximum voltage Q2', 'options': {'ylimit':27}},
+    'IC_Voltage_right_max_Q2': {'name':None, 'fun':'IC_Voltage_right_max_Q2', 'unit':'kV', 'label': 'right Maximum voltage Q2', 'options': {'ylimit':27}},
+    'IC_Voltage_left_max_Q4': {'name':None, 'fun':'IC_Voltage_left_max_Q4', 'unit':'kV', 'label': 'left Maximum voltage Q4', 'options': {'ylimit':27}},
+    'IC_Voltage_right_max_Q4': {'name':None, 'fun':'IC_Voltage_right_max_Q4', 'unit':'kV', 'label': 'right Maximum voltage Q4', 'options': {'ylimit':27}},
     # IC Maximum Current values
-    'IC_Current_left_max_Q1': {'name':None, 'fun':'IC_Current_left_max_Q1', 'unit':'kV', 'label': 'Left Maximum Current Q1', 'options': {'ylimit':27}},
-    'IC_Current_right_max_Q1': {'name':None, 'fun':'IC_Current_right_max_Q1', 'unit':'kV', 'label': 'Right Maximum Current Q1', 'options': {'ylimit':27}},
-    'IC_Current_left_max_Q2': {'name':None, 'fun':'IC_Current_left_max_Q2', 'unit':'kV', 'label': 'Left Maximum Current Q2', 'options': {'ylimit':27}},
-    'IC_Current_right_max_Q2': {'name':None, 'fun':'IC_Current_right_max_Q2', 'unit':'kV', 'label': 'Right Maximum Current Q2', 'options': {'ylimit':27}},
-    'IC_Current_left_max_Q4': {'name':None, 'fun':'IC_Current_left_max_Q4', 'unit':'kV', 'label': 'Left Maximum Current Q4', 'options': {'ylimit':27}},
-    'IC_Current_right_max_Q4': {'name':None, 'fun':'IC_Current_right_max_Q4', 'unit':'kV', 'label': 'Right Maximum Current Q4', 'options': {'ylimit':27}},
+    'IC_Current_left_max_Q1': {'name':None, 'fun':'IC_Current_left_max_Q1', 'unit':'kV', 'label': 'left Maximum Current Q1', 'options': {'ylimit':27}},
+    'IC_Current_right_max_Q1': {'name':None, 'fun':'IC_Current_right_max_Q1', 'unit':'kV', 'label': 'right Maximum Current Q1', 'options': {'ylimit':27}},
+    'IC_Current_left_max_Q2': {'name':None, 'fun':'IC_Current_left_max_Q2', 'unit':'kV', 'label': 'left Maximum Current Q2', 'options': {'ylimit':27}},
+    'IC_Current_right_max_Q2': {'name':None, 'fun':'IC_Current_right_max_Q2', 'unit':'kV', 'label': 'right Maximum Current Q2', 'options': {'ylimit':27}},
+    'IC_Current_left_max_Q4': {'name':None, 'fun':'IC_Current_left_max_Q4', 'unit':'kV', 'label': 'left Maximum Current Q4', 'options': {'ylimit':27}},
+    'IC_Current_right_max_Q4': {'name':None, 'fun':'IC_Current_right_max_Q4', 'unit':'kV', 'label': 'right Maximum Current Q4', 'options': {'ylimit':27}},
     # IC antennas Capacitor Currents
-    'IC_Current_left_upper_Q1': {'name': 'GICHICAPA%1', 'unit': 'A', 'label': 'Left upper capacitor current Q1', 'options': {'ylimit':915}},
-    'IC_Current_left_lower_Q1': {'name': 'GICHICAPA%2', 'unit': 'A', 'label': 'Left lower capacitor current Q1', 'options': {'ylimit':915}},
-    'IC_Current_right_upper_Q1': {'name': 'GICHICAPA%3', 'unit': 'A', 'label': 'Right upper capacitor current Q1', 'options': {'ylimit':915}},
-    'IC_Current_right_lower_Q1': {'name': 'GICHICAPA%4', 'unit': 'A', 'label': 'Right lower capacitor current Q1', 'options': {'ylimit':915}},
-    'IC_Current_left_upper_Q2': {'name': 'GICHICAPA%5', 'unit': 'A', 'label': 'Left upper capacitor current Q2', 'options': {'ylimit':915}},
-    'IC_Current_left_lower_Q2': {'name': 'GICHICAPA%6', 'unit': 'A', 'label': 'Left lower capacitor current Q2', 'options': {'ylimit':915}},
-    'IC_Current_right_upper_Q2': {'name': 'GICHICAPA%7', 'unit': 'A', 'label': 'Right upper capacitor current Q2', 'options': {'ylimit':915}},
-    'IC_Current_right_lower_Q2': {'name': 'GICHICAPA%8', 'unit': 'A', 'label': 'Right lower capacitor current Q2', 'options': {'ylimit':915}},   
-    'IC_Current_left_upper_Q4': {'name': 'GICHICAPA%9', 'unit': 'A', 'label': 'Left upper capacitor current Q4', 'options': {'ylimit':915}},
-    'IC_Current_left_lower_Q4': {'name': 'GICHICAPA%10', 'unit': 'A', 'label': 'Left lower capacitor current Q4', 'options': {'ylimit':915}},
-    'IC_Current_right_upper_Q4': {'name': 'GICHICAPA%11', 'unit': 'A', 'label': 'Right upper capacitor current Q4', 'options': {'ylimit':915}},
-    'IC_Current_right_lower_Q4': {'name': 'GICHICAPA%12', 'unit': 'A', 'label': 'Right lower capacitor current Q4', 'options': {'ylimit':915}}, 
+    'IC_Current_left_upper_Q1': {'name': 'GICHICAPA%1', 'unit': 'A', 'label': 'left upper capacitor current Q1', 'options': {'ylimit':915}},
+    'IC_Current_left_lower_Q1': {'name': 'GICHICAPA%2', 'unit': 'A', 'label': 'left lower capacitor current Q1', 'options': {'ylimit':915}},
+    'IC_Current_right_upper_Q1': {'name': 'GICHICAPA%3', 'unit': 'A', 'label': 'right upper capacitor current Q1', 'options': {'ylimit':915}},
+    'IC_Current_right_lower_Q1': {'name': 'GICHICAPA%4', 'unit': 'A', 'label': 'right lower capacitor current Q1', 'options': {'ylimit':915}},
+    'IC_Current_left_upper_Q2': {'name': 'GICHICAPA%5', 'unit': 'A', 'label': 'left upper capacitor current Q2', 'options': {'ylimit':915}},
+    'IC_Current_left_lower_Q2': {'name': 'GICHICAPA%6', 'unit': 'A', 'label': 'left lower capacitor current Q2', 'options': {'ylimit':915}},
+    'IC_Current_right_upper_Q2': {'name': 'GICHICAPA%7', 'unit': 'A', 'label': 'right upper capacitor current Q2', 'options': {'ylimit':915}},
+    'IC_Current_right_lower_Q2': {'name': 'GICHICAPA%8', 'unit': 'A', 'label': 'right lower capacitor current Q2', 'options': {'ylimit':915}},   
+    'IC_Current_left_upper_Q4': {'name': 'GICHICAPA%9', 'unit': 'A', 'label': 'left upper capacitor current Q4', 'options': {'ylimit':915}},
+    'IC_Current_left_lower_Q4': {'name': 'GICHICAPA%10', 'unit': 'A', 'label': 'left lower capacitor current Q4', 'options': {'ylimit':915}},
+    'IC_Current_right_upper_Q4': {'name': 'GICHICAPA%11', 'unit': 'A', 'label': 'right upper capacitor current Q4', 'options': {'ylimit':915}},
+    'IC_Current_right_lower_Q4': {'name': 'GICHICAPA%12', 'unit': 'A', 'label': 'right lower capacitor current Q4', 'options': {'ylimit':915}}, 
     # IC Errors
     
     ## LHCD
@@ -269,8 +283,8 @@ signals = {
     'baro_Q2': {'name':'GBARDB8%4', 'unit': '--', 'label':'barometry Q2 raw'},
     'baro_Q4': {'name':'GBARDB8%9', 'unit': '--', 'label':'barometry Q4 raw'},
     ## Bolometry
-    'Prad': {'name': None, 'fun':'Prad', 'unit':'MW', 'label':'Prad total'},
-    'Prad_bulk': {'name': None, 'fun':'Prad_bulk', 'unit':'MW', 'label':'Prad bulk'},    
+    'Prad': {'name': None, 'fun':'Prad_pradwest', 'unit':'MW', 'label':'Prad total'},
+    'Prad_bulk': {'name': None, 'fun':'Prad_bulk_pradwest', 'unit':'MW', 'label':'Prad bulk'},    
     'Prad_imas': {'name': None, 'fun':'Prad_imas', 'unit':'MW', 'label':'Prad total (imas)'},
     'Prad_bulk_imas': {'name': None, 'fun':'Prad_bulk_imas', 'unit':'MW', 'label':'Prad bulk (imas)'},    
     # Divertor current
@@ -280,41 +294,41 @@ signals = {
     'Divertor_lower_voltage': {'name':'GPOLO_UDC2%3', 'unit':'V', 'label':'Lower divertor current'},   
     }
 
-def VSWR_Q1_Left(pulse):
+def VSWR_Q1_left(pulse):
     Pow_IncRefQ1, tPow_IncRefQ1 = pw.tsbase(pulse,'GICHANTPOWQ1', nargout=2)   
-    VSWR_Q1_Left  = (1 + np.sqrt(Pow_IncRefQ1[:,1]/Pow_IncRefQ1[:,0])) / \
+    VSWR_Q1_left  = (1 + np.sqrt(Pow_IncRefQ1[:,1]/Pow_IncRefQ1[:,0])) / \
                     (1 - np.sqrt(Pow_IncRefQ1[:,1]/Pow_IncRefQ1[:,0]))
-    return VSWR_Q1_Left, tPow_IncRefQ1
+    return VSWR_Q1_left, tPow_IncRefQ1
 
-def VSWR_Q1_Right(pulse):
+def VSWR_Q1_right(pulse):
     Pow_IncRefQ1, tPow_IncRefQ1 = pw.tsbase(pulse,'GICHANTPOWQ1', nargout=2)   
-    VSWR_Q1_Right  = (1 + np.sqrt(Pow_IncRefQ1[:,3]/Pow_IncRefQ1[:,2])) / \
+    VSWR_Q1_right  = (1 + np.sqrt(Pow_IncRefQ1[:,3]/Pow_IncRefQ1[:,2])) / \
                     (1 - np.sqrt(Pow_IncRefQ1[:,3]/Pow_IncRefQ1[:,2]))
-    return VSWR_Q1_Right, tPow_IncRefQ1
+    return VSWR_Q1_right, tPow_IncRefQ1
 
-def VSWR_Q2_Left(pulse):
+def VSWR_Q2_left(pulse):
     Pow_IncRefQ2, tPow_IncRefQ2 = pw.tsbase(pulse,'GICHANTPOWQ2', nargout=2)   
-    VSWR_Q2_Left  = (1 + np.sqrt(Pow_IncRefQ2[:,1]/Pow_IncRefQ2[:,0])) / \
+    VSWR_Q2_left  = (1 + np.sqrt(Pow_IncRefQ2[:,1]/Pow_IncRefQ2[:,0])) / \
                     (1 - np.sqrt(Pow_IncRefQ2[:,1]/Pow_IncRefQ2[:,0]))
-    return VSWR_Q2_Left, tPow_IncRefQ2
+    return VSWR_Q2_left, tPow_IncRefQ2
 
-def VSWR_Q2_Right(pulse):
+def VSWR_Q2_right(pulse):
     Pow_IncRefQ2, tPow_IncRefQ2 = pw.tsbase(pulse,'GICHANTPOWQ2', nargout=2)   
-    VSWR_Q2_Right  = (1 + np.sqrt(Pow_IncRefQ2[:,3]/Pow_IncRefQ2[:,2])) / \
+    VSWR_Q2_right  = (1 + np.sqrt(Pow_IncRefQ2[:,3]/Pow_IncRefQ2[:,2])) / \
                     (1 - np.sqrt(Pow_IncRefQ2[:,3]/Pow_IncRefQ2[:,2]))
-    return VSWR_Q2_Right, tPow_IncRefQ2
+    return VSWR_Q2_right, tPow_IncRefQ2
 
-def VSWR_Q4_Left(pulse):
+def VSWR_Q4_left(pulse):
     Pow_IncRefQ4, tPow_IncRefQ4 = pw.tsbase(pulse,'GICHANTPOWQ4', nargout=2)   
-    VSWR_Q4_Left  = (1 + np.sqrt(Pow_IncRefQ4[:,1]/Pow_IncRefQ4[:,0])) / \
+    VSWR_Q4_left  = (1 + np.sqrt(Pow_IncRefQ4[:,1]/Pow_IncRefQ4[:,0])) / \
                     (1 - np.sqrt(Pow_IncRefQ4[:,1]/Pow_IncRefQ4[:,0]))
-    return VSWR_Q4_Left, tPow_IncRefQ4
+    return VSWR_Q4_left, tPow_IncRefQ4
 
-def VSWR_Q4_Right(pulse):
+def VSWR_Q4_right(pulse):
     Pow_IncRefQ4, tPow_IncRefQ4 = pw.tsbase(pulse,'GICHANTPOWQ4', nargout=2)   
-    VSWR_Q4_Right  = (1 + np.sqrt(Pow_IncRefQ4[:,3]/Pow_IncRefQ4[:,2])) / \
+    VSWR_Q4_right  = (1 + np.sqrt(Pow_IncRefQ4[:,3]/Pow_IncRefQ4[:,2])) / \
                     (1 - np.sqrt(Pow_IncRefQ4[:,3]/Pow_IncRefQ4[:,2]))
-    return VSWR_Q4_Right, tPow_IncRefQ4
+    return VSWR_Q4_right, tPow_IncRefQ4
 
 
 def smooth(y, window_length=51, polyorder=3):
@@ -355,38 +369,64 @@ def IC_Errors(pulse):
     y = pw.tsmat(pulse, 'DFCI;PILOTAGE;ICHINT')
     return y, np.array([-1, -1, -1])
 
+def Gamma(pulse, antenna='Q1', side='left', t1=None, t2=None):
+    ' Voltage Reflection coefficient at the antenna bidirectional coupler '
+    # incident and reflecter power
+    Pfwd, t_Pfwd = get_sig(pulse, signals[f'IC_P_{antenna}_{side}_fwd'])
+    Pref, t_Pref = get_sig(pulse, signals[f'IC_P_{antenna}_{side}_ref'])
+    # reflected phase
+    phase_Pref, t_phase_Pref = get_sig(pulse, signals[f'IC_Phase_{antenna} (Pr_{side} - Pf_right)'])
+    
+    if t1 and t2:
+        Pfwd = np.mean(in_between(Pfwd, t_Pfwd, t1, t2))
+        Pref = np.mean(in_between(Pref, t_Pref, t1, t2))
+        phase_Pref = np.mean(in_between(phase_Pref, t_phase_Pref, t1, t2))
 
+    return np.sqrt(Pref/Pfwd)*np.exp(1j*phase_Pref*np.pi/180), t_Pfwd
+
+def IC_Gamma_Q1_left(pulse):
+    return np.abs(Gamma(pulse, antenna='Q1', side='left'))
+def IC_Gamma_Q1_right(pulse):
+    return np.abs(Gamma(pulse, antenna='Q1', side='right'))
+def IC_Gamma_Q2_left(pulse):
+    return np.abs(Gamma(pulse, antenna='Q2', side='left'))
+def IC_Gamma_Q2_right(pulse):
+    return np.abs(Gamma(pulse, antenna='Q2', side='right'))
+def IC_Gamma_Q4_left(pulse):
+    return np.abs(Gamma(pulse, antenna='Q4', side='left'))
+def IC_Gamma_Q4_right(pulse):
+    return np.abs(Gamma(pulse, antenna='Q4', side='right'))
 
 def IC_Rc_Q1_avg(pulse):
-    Q1RcLeft,  t_Q1RcLeft  = pw.tsbase(pulse, 'GICHCOUPRES%1', nargout=2)
-    Q1RcRight, t_Q1RcRight = pw.tsbase(pulse, 'GICHCOUPRES%2', nargout=2)
+    Q1Rcleft,  t_Q1Rcleft  = pw.tsbase(pulse, 'GICHCOUPRES%1', nargout=2)
+    Q1Rcright, t_Q1Rcright = pw.tsbase(pulse, 'GICHCOUPRES%2', nargout=2)
     # clean non physical values
-    Q1RcLeft = np.where((Q1RcLeft < 3) & (Q1RcLeft > 0), Q1RcLeft, np.nan)
-    Q1RcRight= np.where((Q1RcRight < 3) & (Q1RcRight > 0), Q1RcRight, np.nan)
+    Q1Rcleft = np.where((Q1Rcleft < 3) & (Q1Rcleft > 0), Q1Rcleft, np.nan)
+    Q1Rcright= np.where((Q1Rcright < 3) & (Q1Rcright > 0), Q1Rcright, np.nan)
     # averages
-    IC_Rc_Q1 = np.nanmean([Q1RcLeft, Q1RcRight], axis=0)
-    #return IC_Rc_Q1, t_Q1RcLeft
-    return Q1RcRight, t_Q1RcRight
+    IC_Rc_Q1 = np.nanmean([Q1Rcleft, Q1Rcright], axis=0)
+    #return IC_Rc_Q1, t_Q1Rcleft
+    return Q1Rcright, t_Q1Rcright
 
 def IC_Rc_Q2_avg(pulse):
-    Q2RcLeft,  t_Q2RcLeft  = pw.tsbase(pulse, 'GICHCOUPRES%3', nargout=2)
-    Q2RcRight, t_Q2RcRight = pw.tsbase(pulse, 'GICHCOUPRES%4', nargout=2)
+    Q2Rcleft,  t_Q2Rcleft  = pw.tsbase(pulse, 'GICHCOUPRES%3', nargout=2)
+    Q2Rcright, t_Q2Rcright = pw.tsbase(pulse, 'GICHCOUPRES%4', nargout=2)
     # clean non physical values
-    Q2RcLeft = np.where((Q2RcLeft < 3) & (Q2RcLeft > 0), Q2RcLeft, np.nan)
-    Q2RcRight= np.where((Q2RcRight < 3) & (Q2RcRight >0), Q2RcRight, np.nan)
+    Q2Rcleft = np.where((Q2Rcleft < 3) & (Q2Rcleft > 0), Q2Rcleft, np.nan)
+    Q2Rcright= np.where((Q2Rcright < 3) & (Q2Rcright >0), Q2Rcright, np.nan)
     # averages
-    IC_Rc_Q2 = np.nanmean([Q2RcLeft, Q2RcRight], axis=0)
-    return IC_Rc_Q2, t_Q2RcLeft
+    IC_Rc_Q2 = np.nanmean([Q2Rcleft, Q2Rcright], axis=0)
+    return IC_Rc_Q2, t_Q2Rcleft
 
 def IC_Rc_Q4_avg(pulse):
-    Q4RcLeft,  t_Q4RcLeft  = pw.tsbase(pulse, 'GICHCOUPRES%5', nargout=2)
-    Q4RcRight, t_Q4RcRight = pw.tsbase(pulse, 'GICHCOUPRES%6', nargout=2)
+    Q4Rcleft,  t_Q4Rcleft  = pw.tsbase(pulse, 'GICHCOUPRES%5', nargout=2)
+    Q4Rcright, t_Q4Rcright = pw.tsbase(pulse, 'GICHCOUPRES%6', nargout=2)
     # clean non physical values
-    Q4RcLeft = np.where((Q4RcLeft < 3) & (Q4RcLeft > 0), Q4RcLeft, np.nan)
-    Q4RcRight= np.where((Q4RcRight < 3) & (Q4RcRight >0), Q4RcRight, np.nan)
+    Q4Rcleft = np.where((Q4Rcleft < 3) & (Q4Rcleft > 0), Q4Rcleft, np.nan)
+    Q4Rcright= np.where((Q4Rcright < 3) & (Q4Rcright >0), Q4Rcright, np.nan)
     # averages
-    IC_Rc_Q4 = np.nanmean([Q4RcLeft, Q4RcRight], axis=0)
-    return IC_Rc_Q4, t_Q4RcLeft
+    IC_Rc_Q4 = np.nanmean([Q4Rcleft, Q4Rcright], axis=0)
+    return IC_Rc_Q4, t_Q4Rcleft
 
 def IC_Rc_avg(pulse):
     """
@@ -439,6 +479,11 @@ def IC_Current_right_max_Q4(pulse):
 Forward power at generator. 
 Available signals concern transmitted and reflected, so fwd is reconstructed
 """
+def IC_Gen_fwd(pulse, i=1):
+    p_tra, t_p_tra = pw.tsbase(pulse, f'GICHPTRAGEN%{i}', nargout=2)
+    p_ref, t_p_ref = pw.tsbase(pulse, f'GICHPREFGEN%{i}', nargout=2)
+    return p_tra + p_ref, t_p_tra
+
 def IC_Gen_fwd1(pulse):
     return IC_Gen_fwd(pulse, i=1)
 def IC_Gen_fwd2(pulse):
@@ -451,11 +496,6 @@ def IC_Gen_fwd5(pulse):
     return IC_Gen_fwd(pulse, i=5)
 def IC_Gen_fwd6(pulse):
     return IC_Gen_fwd(pulse, i=6)
-
-def IC_Gen_fwd(pulse, i=1):
-    p_tra, t_p_tra = pw.tsbase(pulse, f'GICHPTRAGEN%{i}', nargout=2)
-    p_ref, t_p_ref = pw.tsbase(pulse, f'GICHPREFGEN%{i}', nargout=2)
-    return p_tra + p_ref, t_p_tra
 
 """
 phases ICRH
@@ -475,19 +515,19 @@ def delta_phi_toro_Q2_Bot_LmR(pulse):
 def delta_phi_toro_Q4_Bot_LmR(pulse):
     return delta_phi_toro_Qi_Bot_LmR(pulse, i=4)
 
-def delta_phi_polo_Q1_Left_BmT(pulse):
-    return delta_phi_polo_Qi_Left_BmT(pulse, i=1)
-def delta_phi_polo_Q2_Left_BmT(pulse):
-    return delta_phi_polo_Qi_Left_BmT(pulse, i=2)
-def delta_phi_polo_Q4_Left_BmT(pulse):
-    return delta_phi_polo_Qi_Left_BmT(pulse, i=4)
+def delta_phi_polo_Q1_left_BmT(pulse):
+    return delta_phi_polo_Qi_left_BmT(pulse, i=1)
+def delta_phi_polo_Q2_left_BmT(pulse):
+    return delta_phi_polo_Qi_left_BmT(pulse, i=2)
+def delta_phi_polo_Q4_left_BmT(pulse):
+    return delta_phi_polo_Qi_left_BmT(pulse, i=4)
 
-def delta_phi_polo_Q1_Right_BmT(pulse):
-    return delta_phi_polo_Qi_Right_BmT(pulse, i=1)
-def delta_phi_polo_Q2_Right_BmT(pulse):
-    return delta_phi_polo_Qi_Right_BmT(pulse, i=2)
-def delta_phi_polo_Q4_Right_BmT(pulse):
-    return delta_phi_polo_Qi_Right_BmT(pulse, i=4)
+def delta_phi_polo_Q1_right_BmT(pulse):
+    return delta_phi_polo_Qi_right_BmT(pulse, i=1)
+def delta_phi_polo_Q2_right_BmT(pulse):
+    return delta_phi_polo_Qi_right_BmT(pulse, i=2)
+def delta_phi_polo_Q4_right_BmT(pulse):
+    return delta_phi_polo_Qi_right_BmT(pulse, i=4)
 
 # Q1
 def delta_phi_toro_Qi_Top_LmR(pulse, i=1):
@@ -500,16 +540,43 @@ def delta_phi_toro_Qi_Bot_LmR(pulse, i=1):
     dPhiToroBOT_LmR = PhasesQi[:,4] + PhasesQi[:,0] - PhasesQi[:,6]
     return  dPhiToroBOT_LmR % 360, tPhasesQi[:,0]
 
-def delta_phi_polo_Qi_Left_BmT(pulse, i=1):
+def delta_phi_polo_Qi_left_BmT(pulse, i=1):
     PhasesQi, tPhasesQi = pw.tsbase(pulse, f'GICHPHASESQ{i}', nargout=2)
-    dPhiPoloLEFT_BmT  = PhasesQi[:,4] - PhasesQi[:,3]
-    return dPhiPoloLEFT_BmT, tPhasesQi[:,0]
+    dPhiPololeft_BmT  = PhasesQi[:,4] - PhasesQi[:,3]
+    return dPhiPololeft_BmT, tPhasesQi[:,0]
 
-def delta_phi_polo_Qi_Right_BmT(pulse, i=1):
+def delta_phi_polo_Qi_right_BmT(pulse, i=1):
     PhasesQi, tPhasesQi = pw.tsbase(pulse, f'GICHPHASESQ{i}', nargout=2)
-    dPhiPoloRIGHT_BmT = PhasesQi[:,6] - PhasesQi[:,5]
-    return dPhiPoloRIGHT_BmT, tPhasesQi[:,0]
+    dPhiPoloright_BmT = PhasesQi[:,6] - PhasesQi[:,5]
+    return dPhiPoloright_BmT, tPhasesQi[:,0]
 
+'''
+IC Antenna Toroidal Phase filtered (gives NaN when no IC power)
+'''
+def phase_Q1(pulse):
+    P, t_P = get_sig(pulse, signals['IC_P_Q1'])
+    Phase, t_phase = get_sig(pulse, signals['IC_delta_phi_toro_Q1_Bot_LmR'])
+    _filter = np.interp(t_phase, t_P, P > 0.11)
+    # _filter[_filter == False] = np.nan
+    return _filter*Phase, t_phase
+
+def phase_Q2(pulse):
+    P, t_P = get_sig(pulse, signals['IC_P_Q2'])
+    Phase, t_phase = get_sig(pulse, signals['IC_delta_phi_toro_Q2_Top_LmR'])
+    _filter = np.interp(t_phase, t_P, P > 0.11)
+    # _filter[_filter == False] = np.nan
+    return _filter*Phase, t_phase
+
+def phase_Q4(pulse):
+    P, t_P = get_sig(pulse, signals['IC_P_Q4'])
+    Phase, t_phase = get_sig(pulse, signals['IC_delta_phi_toro_Q4_Top_LmR'])
+    _filter = np.interp(t_phase, t_P, P > 0.11)
+    # _filter[_filter == False] = np.nan
+    return _filter*Phase, t_phase
+
+'''
+IC Antenna internal Vacuum 
+'''
 def IC_Q1_vacuum_left(pulse):
     y,t = pw.tsbase(pulse, 'GICHVTRANSFO%1', nargout=2)
     y = 10**(1.667*y - 9.333)
@@ -600,10 +667,29 @@ def pulse_datetime(pulse):
     Return the pulse datetime as a (pandas.)Timestamp and a Python datetime
     """
     date_apilote = pw.tsmat(pulse, 'APILOTE;+VME_PIL;Date_Choc')
+    if not date_apilote:  # in case of : [Query Error] Invalid query, server returned 204: 'Unknown producer'
+        date_apilote = -1
     pulse_dt = pd.to_datetime(date_apilote)
-    return pulse_dt, pulse_dt.to_pydatetime()
+    # return pulse_dt, pulse_dt.to_pydatetime()
+    return [pulse_dt.year, pulse_dt.month, pulse_dt.day], [-1,-1,-1]
 
-  
+def pulse_year(pulse):
+    ' Return the pulse year '
+    date_apilote = pw.tsmat(pulse, 'APILOTE;+VME_PIL;Date_Choc')
+    pulse_dt = pd.to_datetime(date_apilote)
+    return [pulse_dt.year,], [-1,]
+
+def pulse_month(pulse):
+    ' Return the pulse year '
+    date_apilote = pw.tsmat(pulse, 'APILOTE;+VME_PIL;Date_Choc')
+    pulse_dt = pd.to_datetime(date_apilote)
+    return [pulse_dt.month,], [-1,]
+
+def pulse_day(pulse):
+    ' Return the pulse day '
+    date_apilote = pw.tsmat(pulse, 'APILOTE;+VME_PIL;Date_Choc')
+    pulse_dt = pd.to_datetime(date_apilote)
+    return [pulse_dt.day,], [-1,]
 
 def mean_min_max(y):
     """
@@ -736,7 +822,7 @@ def imas(func):
             return np.nan, np.nan
     return wrapper
 
-def Prad(pulse):
+def Prad_pradwest(pulse):
     " total radiated power in MW"
     import pradwestc
     try:
@@ -745,7 +831,7 @@ def Prad(pulse):
     except TypeError as e:
         return np.nan, np.nan
 
-def Prad_bulk(pulse):
+def Prad_bulk_pradwest(pulse):
     import pradwestc
     try:
         Prad,Pbulk,Pdivb,Pdivh,Pchan,bolofmas,tbolo,trad = pradwestc.pradwest1(pulse, fi=0)
@@ -817,11 +903,14 @@ def Vloop(pulse):
     return V_smooth, t
 
 def RF_P_tot(pulse):
+    ''' Total RF Power '''
     P_LH_tot, t_LH_tot = get_sig(pulse, signals['LH_P_tot'])
     P_IC_tot, t_tot = get_sig(pulse, signals['IC_P_tot'])
-    # interpolate LH data on IC data
-    _P_LH_tot = np.interp(t_tot, t_LH_tot, P_LH_tot)
-    return _P_LH_tot + P_IC_tot*1e-3, t_tot
+    # interpolate LH data on IC data or the opposite 
+    if not np.any(np.isnan(P_LH_tot)):
+        P_LH_tot = np.interp(t_tot, t_LH_tot, P_LH_tot)   
+                  
+    return P_LH_tot + P_IC_tot*1e-3, t_tot
 
 def Ohmic_power(pulse):
     V, t_V = Vloop(pulse) # V
