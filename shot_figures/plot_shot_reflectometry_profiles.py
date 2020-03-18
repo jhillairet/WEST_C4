@@ -58,17 +58,7 @@ data = loadmat(file)
 t_ignitron = pw.tsmat(pulse, 'IGNITRON|1')
 data['tX'] -= t_ignitron
 
-#%%
-def time_averaged_profile(data, t_start, t_end):
-    idx_t_start = argmin(abs(data['tX'] - t_start))
-    idx_t_stop = argmin(abs(data['tX'] - t_end))
-    
-    ne_mean = mean(data['NEX'][:,idx_t_start:idx_t_stop], axis=1)
-    ne_std = std(data['NEX'][:,idx_t_start:idx_t_stop], axis=1)
-    r_mean = mean(data['RX'][:,idx_t_start:idx_t_stop], axis=1)
-    r_std = std(data['RX'][:,idx_t_start:idx_t_stop], axis=1)
 
-    return r_mean, r_std, ne_mean, ne_std
 
 #%% ne and r mean, error bar repr with std
 r1, rs1, ne1, nes1 = time_averaged_profile(data, td1, tf1)

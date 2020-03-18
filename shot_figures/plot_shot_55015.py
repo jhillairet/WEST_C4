@@ -194,5 +194,33 @@ savefig(f'WEST_IC_{pulse}_Dco.png', dpi=150)
 
 
 
+#%% 
+fig, ax = plt.subplots(2,1,sharex=True)
+ax[0].plot(t_Ip, Ip, lw=2)
+ax[1].plot(t_Q4, np.squeeze(P_Q1+P_Q2+P_Q4), color='k', label='Total RF Power')
+#ax[1].plot(t_LH, P_LH_tot, label='LH', lw=2, color='C0')
+# ax[1].plot(t_Q1, P_Q1, label='IC Q1', lw=2, color='C0')
+# ax[1].plot(t_Q2, P_Q2, label='IC Q2', lw=2, color='C1')
+# ax[1].plot(t_Q4, P_Q4, label='IC Q4', lw=2, color='C2')
 
+ax2 = ax[0].twinx()
+ax2.plot(t_nl, nl, lw=2, color='C1')
+
+ax[1].set_xlabel('Time [s]', fontsize=14)
+ax[0].set_ylabel('Ip [kA]', fontsize=14, color='C0')
+ax2.set_ylabel('nl [$10^{19}$ $m^{-3}$]', fontsize=14, color='C1')
+ax[1].set_ylabel('IC Power [kW]', fontsize=14)
+ax[1].legend(fontsize=12, loc='upper right')
+[a.grid(True, alpha=0.2) for a in ax]
+[a.tick_params(labelsize=14) for a in ax]
+ax[0].tick_params(color='C0', labelcolor='C0')
+ax2.tick_params(color='C1', labelcolor='C1')
+
+ax[0].set_xlim(-0.1, 16)
+
+ax[0].set_title(f'WEST #{pulse}', fontsize=14)
+fig.tight_layout()
+
+#%%
+savefig(f'WEST_IC_{pulse}_IAEA.png', dpi=150)
 

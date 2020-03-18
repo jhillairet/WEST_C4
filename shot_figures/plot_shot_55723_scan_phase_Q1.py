@@ -45,9 +45,10 @@ Rext, t_Rext = get_sig(pulse, signals['Rext_median'])
 Prad, t_Prad = get_sig(pulse, signals['Prad'])
 Prad_bulk, t_Prad_bulk = get_sig(pulse, signals['Prad_bulk'])
 
+#%%
 phaseQ1, t_phaseQ1 = get_sig(pulse, signals['IC_delta_phi_toro_Q1_Bot_LmR'], do_smooth=True) 
-phaseQ2, t_phaseQ2 = get_sig(pulse, signals['IC_delta_phi_toro_Q2_Top_LmR'], do_smooth=True) 
-phaseQ4, t_phaseQ4 = get_sig(pulse, signals['IC_delta_phi_toro_Q4_Top_LmR'], do_smooth=True)
+# phaseQ2, t_phaseQ2 = get_sig(pulse, signals['IC_delta_phi_toro_Q2_Top_LmR'], do_smooth=True) 
+# phaseQ4, t_phaseQ4 = get_sig(pulse, signals['IC_delta_phi_toro_Q4_Top_LmR'], do_smooth=True)
 
 
 #%% 
@@ -64,7 +65,7 @@ ax2.set_ylabel('nl [$10^{19}$ $m^{-3}$]', fontsize=14, color='C1')
 ax2.tick_params(color='C1', labelcolor='C1')
 
 ax[1].plot(t_Q1, P_Q1, label='IC Q1', lw=2, color='C0')
-ax[1].plot(t_Q4, P_Q4, label='IC Q4', lw=2, color='C2')
+# ax[1].plot(t_Q4, P_Q4, label='IC Q4', lw=2, color='C2')
 ax[1].plot(t_Prad, Prad*1e3, label='Prad (tot)')
 ax[1].plot(t_Prad_bulk, Prad_bulk*1e3, label='Prad (bulk)')
 
@@ -77,7 +78,7 @@ ax[2].plot(t_Rc_Q1, Rc_Q1, label='Rc Q1', lw=2, color='C2')
 ax[2].set_ylabel('Rc [Ohm]', fontsize=14)
 _ax = ax[2].twinx()
 _ax.plot(t_phaseQ1, phaseQ1, lw=2, color='C1', label='Phase Q1')
-_ax.plot(t_phaseQ4, phaseQ4, lw=2, color='C4', label='Phase Q4')
+# _ax.plot(t_phaseQ4, phaseQ4, lw=2, color='C4', label='Phase Q4')
 
 _ax.set_ylabel('Tor.Phase [deg]', fontsize=14, color='C1')
 _ax.tick_params(color='C1', labelcolor='C1')

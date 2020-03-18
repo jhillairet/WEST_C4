@@ -93,22 +93,22 @@ ax.set_xlabel('Radius [m]', fontsize=12)
 ax.set_title(f'WEST #54903 (LSN, Q1 + Q4)')
 
 #%%
-## FW cut off density
-#from scipy.constants import c, epsilon_0, e, m_p
-#from astropy import units as u
-#from plasmapy.physics.parameters import gyrofrequency
-#omega_0 = 2*np.pi*55.5e6
-#k_0 = omega_0 / c
-#k_parallel = 14  # m^-1
-## Itor 1250 A, meaning 3.7T at R=2.5 m
-#R0 = 2.5
-#B0 = 3.7
-#omega_ci = gyrofrequency(B=R0/r*B0*u.T, particle='D', Z=2, signed=True).value 
-#
-#nc_R = epsilon_0/e**2*1/(1/m_p/(omega_0 + omega_ci)/omega_0)*(k_parallel**2/k_0**2 - 1)
-#nc_L = epsilon_0/e**2*1/(1/m_p/(omega_0 - omega_ci)/omega_0)*(k_parallel**2/k_0**2 - 1)
-#
-#ax.axhline(nc_L.mean(), color='r', lw=2, alpha=0.3)
+# FW cut off density
+from scipy.constants import c, epsilon_0, e, m_p
+from astropy import units as u
+from plasmapy.physics.parameters import gyrofrequency
+omega_0 = 2*np.pi*55.5e6
+k_0 = omega_0 / c
+k_parallel = 14  # m^-1
+# Itor 1250 A, meaning 3.7T at R=2.5 m
+R0 = 2.5
+B0 = 3.7
+omega_ci = gyrofrequency(B=R0/r*B0*u.T, particle='D', Z=2, signed=True).value 
+
+nc_R = epsilon_0/e**2*1/(1/m_p/(omega_0 + omega_ci)/omega_0)*(k_parallel**2/k_0**2 - 1)
+nc_L = epsilon_0/e**2*1/(1/m_p/(omega_0 - omega_ci)/omega_0)*(k_parallel**2/k_0**2 - 1)
+
+ax.axhline(nc_L.mean(), color='r', lw=2, alpha=0.3)
           
 #%%
 fig.savefig('WEST_54903_reflectometry_profiles.png', dpi=150)

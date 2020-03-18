@@ -15,7 +15,7 @@ from matplotlib.pyplot import *
 
 #%%  Q1 scan phase
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 55222
-pulse = 55723
+# pulse = 55723
 pulse = 55724  # le meme que 55723 avec un fond de Q4
 
 Ip, t_Ip = get_sig(pulse, signals['Ip'])

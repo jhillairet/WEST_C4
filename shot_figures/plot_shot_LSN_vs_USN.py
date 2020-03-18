@@ -298,6 +298,26 @@ P_Q4_USN, t_Q4_USN = get_sig(USN, signals['IC_P_Q4'])
 
 data_USN = loadmat(f'../reflectometry/profiles/WEST_{USN}_prof.mat')
 data_LSN = loadmat(f'../reflectometry/profiles/WEST_{LSN}_prof.mat')
+
+Rc_Q1_LSN, t_Rc_Q1_LSN = get_sig(LSN, signals['IC_Rc_Q1_avg'])
+Rc_Q2_LSN, t_Rc_Q2_LSN = get_sig(LSN, signals['IC_Rc_Q2_avg'])
+Rc_Q4_LSN, t_Rc_Q4_LSN = get_sig(LSN, signals['IC_Rc_Q4_avg'])
+Rc_Q1_USN, t_Rc_Q1_USN = get_sig(USN, signals['IC_Rc_Q1_avg'])
+Rc_Q2_USN, t_Rc_Q2_USN = get_sig(USN, signals['IC_Rc_Q2_avg'])
+Rc_Q4_USN, t_Rc_Q4_USN = get_sig(USN, signals['IC_Rc_Q4_avg'])
+
+#%% clean Rc data and get max
+Rc_Q1_LSN[P_Q1_LSN < 1] = 0
+Rc_Q2_LSN[P_Q2_LSN < 1] = 0
+Rc_Q4_LSN[P_Q4_LSN < 1] = 0
+Rc_Q1_USN[P_Q1_USN < 1] = 0
+Rc_Q2_USN[P_Q2_USN < 1] = 0
+Rc_Q4_USN[P_Q4_USN < 1] = 0
+
+
+Rc_max_LSN = np.max([Rc_Q1_LSN, Rc_Q2_LSN, Rc_Q4_LSN], axis=0)
+Rc_max_USN = np.max([Rc_Q1_USN, Rc_Q2_USN, Rc_Q4_USN], axis=0)
+
 #%%
 nco = 1e19
 Rant_USN = R_IC_USN[2]
@@ -313,25 +333,36 @@ Dco_USN = (Rant_USN - data_USN['RX'][idx_nco_USN][0] )* 1e3
 Dco_LSN = (Rant_LSN - data_LSN['RX'][idx_nco_LSN][0] )* 1e3
 
 #%%
-fig, ax = plt.subplots(3, 1, sharex=True)
-ax[0].plot(t_Q4_LSN, np.squeeze(P_Q1_LSN+P_Q2_LSN+P_Q4_LSN), label=f'LSN')
-ax[0].plot(t_Q4_USN, np.squeeze(P_Q1_USN+P_Q2_USN+P_Q4_USN), label=f'USN')
-ax[0].set_ylabel('IC Coupled Power [kW]', fontsize=10)
-ax[0].legend(loc=3)
+fig, ax = plt.subplots(3, 1, sharex=True, figsize=(6,8))
+# ax[0].plot(t_Q4_LSN, np.squeeze(P_Q1_LSN+P_Q2_LSN+P_Q4_LSN), label=f'LSN')
+# ax[0].plot(t_Q4_USN, np.squeeze(P_Q1_USN+P_Q2_USN+P_Q4_USN), label=f'USN')
+# ax[0].set_ylabel('IC Coupled Power [kW]', fontsize=10)
+# ax[0].legend(loc=3)
+ax[0].plot(t_Rc_Q1_LSN, Rc_max_LSN, label='LSN')
+ax[0].plot(t_Rc_Q1_USN, Rc_max_USN, label='USN')
+ax[0].set_ylabel('Max Rc ($\Omega$]', fontsize=12)
+
 
 ax[1].plot(t_Rext_LSN, Dext_LSN, lw=2, label=f'LSN')
 ax[1].plot(t_Rext_USN, Dext_USN, lw=2, label=f'USN')
 ax[1].set_ylabel('Dist. to Rext [mm]', fontsize=10)
 ax[1].set_ylim(0, 34)
 
+ax[2].plot(data_LSN['tX'].squeeze() - 32, Dco_LSN, color='C0', alpha=0.2)
+ax[2].plot(data_LSN['tX'].squeeze() - 32, smooth(Dco_LSN), color='C0', label='LSN')
 
-ax[2].plot(data_LSN['tX'].squeeze() - 32, Dco_LSN)
-ax[2].plot(data_USN['tX'].squeeze() - 32, Dco_USN)
+ax[2].plot(data_USN['tX'].squeeze() - 32, Dco_USN, color='C1', alpha=0.2)
+ax[2].plot(data_USN['tX'].squeeze() - 32, smooth(Dco_USN), color='C1', label='USN')
+
 ax[2].set_ylabel('Cutoff Dist. [mm]', fontsize=10)
-ax[2].set_xlim(6.3, 9.7)
+ax[2].set_xlim(5.7, 9.7)
 ax[2].set_ylim(0, 100)
 ax[2].set_xlabel('Time [s]', fontsize=12)
 
+[a.legend() for a in ax]
 fig.suptitle(f'WEST #{LSN}(LSN) vs #{USN}(USN)')
+fig.tight_layout()
+fig.subplots_adjust(hspace=0)
+#%%
 fig.savefig(f'WEST_IC_{LSN}_vs_{USN}_Rext_Dco.png', dpi=150)
 
