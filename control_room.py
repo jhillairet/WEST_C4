@@ -1082,3 +1082,95 @@ def radiated_fraction(pulse):
         return frac, Prad_ohmic, Prad_RF, PRF_max
     except ValueError as e:
         return np.NaN, np.NaN, np.NaN, np.NaN
+
+
+def filter_times(y, t, ts):
+    '''
+    Keep only relevant data from a time series
+
+    Parameters
+    ----------
+    y : array
+        y(t)
+    t : array
+        time
+    ts : list of tuples (t1, t2)
+        [(t1, t2), (t3, t4), ...]
+        where t1 is tart time, t2 stop time, etc.
+
+    Returns
+    -------
+    y_out : array
+        y(t)
+    t_out : array
+        time
+
+    '''
+    y_out = np.array([])
+    t_out = np.array([])
+    for (t1, t2) in ts:
+        _y, _t = in_between(y, t, t1, t2)
+        y_out = np.concatenate((y_out, _y))
+        t_out = np.concatenate((t_out, _t))
+    return y_out, t_out
+
+def time_averaged_profile(data, t_start, t_end, t_init=32):
+    '''
+    Return time averaged reflectometry profiles
+
+    Parameters
+    ----------
+    data : dictionnary
+        data['tX'] : time
+        data['NEX'] : density
+        data['RX'] : radius
+    t_start : float
+        start time
+    t_end : float
+        stop time
+    t_init: float. Default=32
+        ignitron time
+
+    Returns
+    -------
+    r_mean : array
+        average radius
+    r_std : array
+        standard deviation radius
+    ne_mean : array
+        average density
+    ne_std : array
+        standard deviation density
+
+    '''
+    idx_t_start = np.argmin(abs(data['tX'] - t_start - t_init))
+    idx_t_stop = np.argmin(abs(data['tX'] - t_end - t_init))
+    
+    ne_mean = np.mean(data['NEX'][:,idx_t_start:idx_t_stop], axis=1)
+    ne_std = np.std(data['NEX'][:,idx_t_start:idx_t_stop], axis=1)
+    r_mean = np.mean(data['RX'][:,idx_t_start:idx_t_stop], axis=1)
+    r_std = np.std(data['RX'][:,idx_t_start:idx_t_stop], axis=1)
+
+    return r_mean, r_std, ne_mean, ne_std
+
+def Pam3s_to_els(flowrate_Pam3s, gas='H'):
+    '''
+    Convert flow rates from Pa.m^3/s to el/s
+    
+    1 mole de gaz occupe 22.4L (1L=1e-3m^3) à 1 bar (=1e5 Pa) et contient 6.022x10^23 molécules 
+    et donc pour H:  1.2x10^24 elec.
+    Donc 22.4*1e-3 m^3 * 1e5 Pa =  1.2x10^24 elec.
+    --> 1 Pa.m^3 = 0.54x10^21 elec.    
+    
+    Parameters
+    ----------
+    flowrate_Pam3s: array
+        Flow rate in Pa.m^3/s
+
+    Returns
+    -------
+    flowrate_els: array
+        Flow rate in el/s
+
+    '''
+    return flowrate_Pam3s * 0.54e21
