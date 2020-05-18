@@ -8,7 +8,8 @@ import os
 import json
 from itertools import cycle
 from scipy.io import loadmat
-
+from scipy.constants import m_p, pi, e, epsilon_0, c 
+    
 signals = {
     ## Shot properties
     'Datetime': {'name': None, 'fun': 'pulse_datetime', 'unit':'', 'label':'pulse datetime'},
@@ -20,11 +21,13 @@ signals = {
     'Vloop': {'name': None, 'fun':'Vloop', 'unit': 'V', 'label': 'Loop voltage'},
     'Ohmic_P': {'name': None, 'fun':'Ohmic_power', 'unit':'MW', 'label':'Ohmic Power'},
     'Separatrix_P': {'name':None, 'fun':'Separatrix_power', 'unit':'MW', 'label':'Power at separatrix', 'options':{'ylim':(0, 5)}},
-    'Te': {'name':None, 'fun':'Te', 'unit':'eV', 'label':'Te Central' },
-    'Rext_upper': {'name': 'GMAG_TEST%1', 'unit': 'mm', 'label': 'Rext upper'},  # Rext upper
+    'Te': {'name':None, 'fun':'get_Te', 'unit':'eV', 'label':'Te Central',  },
+    'Rext_upper': {'name': 'GMAG_TEST%1', 'unit': 'mm', 'label': 'Rext at Z=+250 mm'},  # Rext upper
     'Rext_median': {'name': 'GMAG_TEST%2', 'unit': 'mm', 'label': 'Rext median', 'options':{'ylim':(2900, 2950)}},  # Rext median
-    'Rext_lower': {'name': 'GMAG_TEST%3', 'unit': 'mm', 'label': 'Rext lower'},  # Rext lower
+    'Rext_lower': {'name': 'GMAG_TEST%3', 'unit': 'mm', 'label': 'Rext at Z=-250 mm'},  # Rext lower
+    'Rext_upper_NICE': {'name':None, 'fun':'Rext_upper_nice', 'unit':'mm', 'label':'Rext at Z=+250 mm (NICE)'},
     'Rext_median_NICE': {'name':None, 'fun':'Rext_median_nice', 'unit':'mm', 'label':'Rext median (NICE)', 'options':{'ylim':(2900, 2950)}},
+    'Rext_lower_NICE': {'name':None, 'fun':'Rext_lower_nice', 'unit':'mm', 'label':'Rext at Z=-250 mm (NICE)'},
     'Dext_Q1': {'name': None, 'fun':'Dext_Q1', 'unit': 'mm', 'label': 'Radial Gap with Q1', 'options':{'ylim':(0, 60)}},
     'Dext_Q2': {'name': None, 'fun':'Dext_Q2', 'unit': 'mm', 'label': 'Radial Gap with Q2', 'options':{'ylim':(0, 60)}},
     'Dext_Q4': {'name': None, 'fun':'Dext_Q4', 'unit': 'mm', 'label': 'Radial Gap with Q4', 'options':{'ylim':(0, 60)}},
@@ -77,6 +80,7 @@ signals = {
     # IC antenna positions (use tsmat)
     'IC_Positions': {'name': None, 'fun': 'IC_Positions', 'unit': 'm', 'label': 'IC Antenna positions'},
     'LH_Positions': {'name': None, 'fun': 'LH_Positions', 'unit': 'm', 'label': 'LH Antenna positions'},
+    'LPA_Position': {'name': 'GMAG_POSLPA%1', 'unit': 'm', 'label': 'LPA position'},
     # IC antenna frequencies (use tsmat)
     'IC_Frequencies': {'name': None, 'fun': 'IC_Frequencies', 'unit': 'MHz', 'label': 'IC Antenna Frequencies'},
     # FPGA temperatures
@@ -292,6 +296,8 @@ signals = {
     'Divertor_lower_current': {'name':'GPOLO_IDC2%2', 'unit':'kA', 'label':'Lower divertor current'},    
     'Divertor_lower_voltage_cons': {'name':'GPOLO_UDC2%2', 'unit':'V', 'label':'Lower divertor current consigne'},
     'Divertor_lower_voltage': {'name':'GPOLO_UDC2%3', 'unit':'V', 'label':'Lower divertor current'},   
+    # MHD
+    'MHD' : {'name':'GMHD_D1%2', 'unit':'a.u.', 'label':'MHD mode envelop'},
     }
 
 def VSWR_Q1_left(pulse):
@@ -341,6 +347,11 @@ def IC_Positions(pulse):
 def LH_Positions(pulse):
     y = pw.tsmat(pulse, 'EXP=T=S;Position;PosLHCD')
     return y, np.array([-1, -1])
+
+def LPA_Position(pulse):
+    ' Constant value - to be used only if GMAG_POSLPA%1 is not working'
+    y = pw.tsmat(pulse, 'EXP=T=S;Position;PosLPA')
+    return np.array([y]), np.array([-1])
 
 def IC_Frequencies(pulse):
     y = pw.tsmat(pulse, 'DFCI;PILOTAGE;ICHFREQ')
@@ -701,17 +712,75 @@ def mean_min_max(y):
 def mean_std(y):
     """
     Return the mean and standard deviation of an array
+
+    Parameters
+    ----------
+    y : array
+        signal
+
+    Returns
+    -------
+    mean : array
+        mean of the signal y(t)
+    std : array
+        std of the signal y(t)  
+    
     """
     return np.mean(y), np.std(y)
 
 def mean_std_in_between(y, t, t_start=0, t_end=1000):
+    """
+    Return the mean and std for a subset of signal y(t). 
+
+    Parameters
+    ----------
+    y : array
+        signal
+    t : array
+        time
+    t_start : float, optional
+        Start time. The default is 0.
+    t_end : float, optional
+        End time. The default is 1000.
+
+    Returns
+    -------
+    mean : array
+        mean of the signal y(t) in [t_start, t_end]
+    std : array
+        std of the signal y(t) in [t_start, t_end]
+
+    """
     _y, _t = in_between(y, t, t_start, t_end)
     return mean_std(_y)
+
 
 def scope(pulses, signames, 
           do_smooth=False, style_label='default', cycling_mode='ls',
           window_loc=(0,0), **kwargs):
-    
+    """
+    Generate a scope for the list of pulses and the list of signal names.
+
+    Parameters
+    ----------
+    pulses : list of integer
+        list of pulse number
+    signames : list (of list) of signals
+        Description of the signals to plot
+    do_smooth : boolean, optional
+        Should we smooth signals? The default is False.
+    style_label : str, optional
+        Matplotlib style to use for the figures. The default is 'default'.
+    cycling_mode : str, optional
+        'ls' (linestyle) or 'color'. The default is 'ls'.
+    window_loc : tuple of 2 integer, optional
+        Default location of the window. The default is (0,0).
+
+    Returns
+    -------
+    None.
+
+    """
     with plt.style.context(style_label):
     
         t_fin_acq = []
@@ -838,6 +907,17 @@ def Prad_bulk_pradwest(pulse):
         return Pbulk, trad - tignitron(pulse)[0]
     except TypeError as e:
         return np.nan, np.nan
+
+def frad(pulse):
+    P_ohmic, t_P_ohmic = get_sig(pulse, signals['Ohmic_P'])
+    P_RF, t_P_RF = get_sig(pulse, signals['RF_P_tot'])
+    
+    # data['Ptot'] = data['Ohmic_P'] + data['LH_P_tot'] + data['IC_P_tot']/1e3
+    # data['P_conv'] = data['Ptot'] - data['Prad_bulk']
+    # data['frad'] = data['Prad']/data['Ptot']
+    # data['frad_bulk'] = data['Prad_bulk']/data['Ptot']
+        
+    
 @imas
 def Prad_imas(pulse):
     bolo = imas_west.get(pulse, 'bolometer')
@@ -849,12 +929,78 @@ def Prad_bulk_imas(pulse):
     return bolo.power_radiated_inside_lcfs/1e6, bolo.time - tignitron(pulse)[0]
 
 
-@imas
+# @imas
+# def Rext_median_nice(pulse):
+#     equi = imas_west.get(pulse, 'equilibrium', 0, 1)
+#     mask_eq = np.asarray(equi.code.output_flag) >= 0 # To remove not converged equilibria
+#     r_ext = np.max(equi.profiles_1d.r_outboard[mask_eq], axis=1)
+#     return r_ext*1e3, equi.time[mask_eq] - tignitron(pulse)[0]
+
+
+def Rext_outboard_nice(pulse):
+    " Return Rext median estimated by NICE reconstruction "   
+    script_name='save_from_imas.py'   
+    ids_name='equilibrium'
+    paths=["profiles_1d.r_outboard", "time"]
+    # Run the transmitted script remotely with args passed as json-like
+    #https://stackoverflow.com/questions/18006161/how-to-pass-dictionary-as-command-line-argument-to-python-script
+    cmd = 'module load tools_dc; python save_from_imas.py \'{"pulse":"'+str(pulse)+'", "ids_name":"'+ids_name+'", "paths":'+json.dumps(paths)+'}\''
+        
+    data = imas_get_remote(pulse, cmd, script_name)
+    y = data['arr_0']
+    t = data['arr_1'] - tignitron(pulse)[0]
+    y = np.max(y, axis=1)
+    return y, t
+
+def Rext_upper_nice(pulse):
+    " Return Rext upper @ Z=+250 mm estimated by NICE reconstruction "
+    script_name='save_from_imas_Rext_upper.py'  
+    cmd = 'module load tools_dc; python '+script_name+' \'{"pulse":"'+str(pulse)+'", "Z":"0.25"}\''
+
+    data  = imas_get_remote(pulse, cmd, script_name)
+    r_ext = data['arr_0']
+    t = data['arr_1'] - tignitron(pulse)[0]
+    # z_at_r_ext = data['arr_2']
+    
+    return r_ext, t    
+
 def Rext_median_nice(pulse):
-    equi = imas_west.get(pulse, 'equilibrium', 0, 1)
-    mask_eq = np.asarray(equi.code.output_flag) >= 0 # To remove not converged equilibria
-    r_ext = np.max(equi.profiles_1d.r_outboard[mask_eq], axis=1)
-    return r_ext*1e3, equi.time[mask_eq] - tignitron(pulse)[0]
+    " Return Rext lower @ Z=0 mm estimated by NICE reconstruction "
+    script_name='save_from_imas_Rext_upper.py'  
+    cmd = 'module load tools_dc; python '+script_name+' \'{"pulse":"'+str(pulse)+'", "Z":"0"}\''
+
+    data  = imas_get_remote(pulse, cmd, script_name)
+    r_ext = data['arr_0']
+    t = data['arr_1'] - tignitron(pulse)[0]
+    # z_at_r_ext = data['arr_2']
+    
+    return r_ext, t        
+
+def Rext_lower_nice(pulse):
+    " Return Rext lower @ Z=-250 mm estimated by NICE reconstruction "
+    script_name='save_from_imas_Rext_upper.py'  
+    cmd = 'module load tools_dc; python '+script_name+' \'{"pulse":"'+str(pulse)+'", "Z":"-0.25"}\''
+
+    data  = imas_get_remote(pulse, cmd, script_name)
+    r_ext = data['arr_0']
+    t = data['arr_1'] - tignitron(pulse)[0]
+    # z_at_r_ext = data['arr_2']
+    
+    return r_ext, t    
+
+
+def z_at_r_ext_nice(pulse):
+    " Return Rext lower @ Z=-250 mm estimated by NICE reconstruction "
+    script_name='save_from_imas_Rext_upper.py'  
+    cmd = 'module load tools_dc; python '+script_name+' \'{"pulse":"'+str(pulse)+'", "Z":"0"}\''
+
+    data  = imas_get_remote(pulse, cmd, script_name)
+    # r_ext = data['arr_0']
+    t = data['arr_1'] - tignitron(pulse)[0]
+    z_at_r_ext = data['arr_2']
+    
+    return z_at_r_ext, t  
+
     
 def sum_power(pulse):
     P1, t1 = pw.tsmat(pulse, 'SICHPQ1', nargout=2)
@@ -904,11 +1050,15 @@ def Vloop(pulse):
 
 def RF_P_tot(pulse):
     ''' Total RF Power '''
-    P_LH_tot, t_LH_tot = get_sig(pulse, signals['LH_P_tot'])
-    P_IC_tot, t_tot = get_sig(pulse, signals['IC_P_tot'])
+    P_LH_tot, t_LH_tot = get_sig(pulse, signals['LH_P_tot'])   
+    P_IC_tot, t_tot = get_sig(pulse, signals['IC_P_tot'])   
+    
     # interpolate LH data on IC data or the opposite 
     if not np.any(np.isnan(P_LH_tot)):
         P_LH_tot = np.interp(t_tot, t_LH_tot, P_LH_tot)   
+    else:
+        # no LH data -> 0
+        P_LH_tot = np.zeros_like(P_IC_tot)
                   
     return P_LH_tot + P_IC_tot*1e-3, t_tot
 
@@ -947,14 +1097,11 @@ def Separatrix_power(pulse):
     return P_Ohm + _P_LH + _P_IC - _P_rad_b, t
 
 
-
-
-
-
-#%%
-def imas_get_remote(pulse, ids_name='ece',
-                    paths=['t_e_central.data', 'time'],
-                    imas_obj_fname='tmp_imas_data.npz'):
+def imas_get_remote(pulse, cmd, script_name):
+                    # ids_name='ece',
+                    # paths=['t_e_central.data', 'time'],
+                    # imas_obj_fname='tmp_imas_data.npz',
+                    # ):
     """
     Get a WEST IMAS data for a given IMAS IDS and paths
 
@@ -968,6 +1115,8 @@ def imas_get_remote(pulse, ids_name='ece',
         list of IMAS IDS path to retrieve. Default is paths=['t_e_central.data', 'time']
     imas_obj_fname : str, optional
         Temporary name for file exchange. The default is 'tmp_imas_data.npz'.
+    scipt_name: string
+        filename of the python script to execute remotly
 
     Returns
     -------
@@ -975,6 +1124,13 @@ def imas_get_remote(pulse, ids_name='ece',
         Data corresponding to the order of the path dictionnary
 
     """
+    # temp local file
+    from tempfile import TemporaryFile
+    from pathlib import Path
+    
+    imas_obj_fname = 'tmp_imas_data.npz'
+    # if this temp file already exist
+    
     # First need to set up SSH keys
     privatekeyfile = os.path.expanduser('id_priv.rsa')
     mykey = paramiko.RSAKey.from_private_key_file(privatekeyfile, password='HenS2008')
@@ -983,16 +1139,9 @@ def imas_get_remote(pulse, ids_name='ece',
     client.load_system_host_keys()
     client.connect('talitha.intra.cea.fr', username='JH218595', pkey=mykey)
 
-    #%%
     # Setup sftp connection and transmit this script
     sftp = client.open_sftp()
-    sftp.put('C:/Users/JH218595/Documents/WEST_C4/save_from_imas.py', 'save_from_imas.py')
-
-    # Run the transmitted script remotely with args passed as json-like
-    #https://stackoverflow.com/questions/18006161/how-to-pass-dictionary-as-command-line-argument-to-python-script
-    cmd = 'module load tools_dc; python save_from_imas.py \'{"pulse":'+str(pulse)+\
-        ', "ids_name":"'+ids_name+\
-        '", "paths":'+json.dumps(paths)+'}\''
+    sftp.put('C:/Users/JH218595/Documents/WEST_C4/'+script_name, script_name)
 
     stdin, stdout, stderr = client.exec_command(cmd)
     print(cmd)
@@ -1002,18 +1151,16 @@ def imas_get_remote(pulse, ids_name='ece',
         # Process each line in the remote output
         print(line)
 
-    #%%
     # Retrieve the IMAS object
-    print(f'Copying remote file {imas_obj_fname} locally....')
+    path_local = Path(os.getcwd()+'/'+imas_obj_fname)
+    print(f'Copying remote file locally to {path_local}....')
     sftp.get(remotepath=f'/Home/JH218595/{imas_obj_fname}',
-             localpath=f'C:/Users/JH218595/Documents/WEST_C4/{imas_obj_fname}')
+             localpath=path_local.as_posix())
     sftp.close()
     
-    #%%
     # close the SSH session
     client.close()
     
-    #%%
     # test: open local file
     data = np.load(imas_obj_fname, allow_pickle=True)
 
@@ -1026,12 +1173,22 @@ def imas_get_remote(pulse, ids_name='ece',
 #     ece = imas_west.get(pulse, 'ece')
 #     return ece.t_e_central.data, ece.time - tignitron(pulse)[0]
 
-def Te(pulse):
-    data = imas_get_remote(pulse, ids_name='ece',
-                           paths=['t_e_central.data', 'time'])
-    y = data['data'][0,:]
-    t = data['data'][1,:]
-    return y, t - tignitron(pulse)[0]
+def get_Te(pulse):
+    script_name='save_from_imas.py'   
+    ids_name='ece'
+    paths=["t_e_central.data", "time"]
+    # Run the transmitted script remotely with args passed as json-like
+    #https://stackoverflow.com/questions/18006161/how-to-pass-dictionary-as-command-line-argument-to-python-script
+    cmd = 'module load tools_dc; python save_from_imas.py \'{"pulse":"'+str(pulse)+'", "ids_name":"'+ids_name+'", "paths":'+json.dumps(paths)+'}\''
+
+    data = imas_get_remote(pulse, cmd, script_name) 
+
+    y = data['arr_0']
+    t = data['arr_1'] - tignitron(pulse)[0]
+    return y, t
+    # y = data['data'][0,:]
+    # t = data['data'][1,:]
+    # return y, t - tignitron(pulse)[0]
 
 
 
@@ -1174,3 +1331,103 @@ def Pam3s_to_els(flowrate_Pam3s, gas='H'):
 
     '''
     return flowrate_Pam3s * 0.54e21
+
+def cutoff_density_fw_approx(f=55.5e6, k_parallel=11, B=3.2):
+    '''
+    Return the Fast-Wave cut-off density. Appoximation for Deuterium only plasma
+
+    Parameters
+    ----------
+    f : float, optional
+        RF frequency in Hz. Default is 55.5e6 Hz
+    k_parallel : float, optional
+        k_parallel value to use. Default is 11 m^-1
+    B : float, optional
+        magnetic field. The default is 3.2 T.
+
+    Returns
+    -------
+    ne_co: float
+        cut-off density in m^-3
+
+    '''
+    from scipy.constants import e, m_p, epsilon_0
+    omega0 = 2*pi*f
+    k0 = omega0/c
+    # cyclotron frequency for Hydrogen
+    omega_cH = e*B/m_p
+    # deuterium
+    Z = 1
+    A = 2
+    # approximation for m_s = Z m_p
+    ne_co = c**2*epsilon_0*m_p/e**2 * (k_parallel**2 - k0**2)*omega_cH/omega0*(1 + Z/(1-Z+A*omega0/omega_cH))
+    
+    return ne_co
+
+def cutoff_density_fw(f=55.5e6, k_parallel=11, B=3.2):
+    '''
+    Return the Fast-Wave cut-off density. Calculation made with PlasmaPy for Deuterium plasma only
+
+    Parameters
+    ----------
+    f : float, optional
+        RF frequency in Hz. Default is 55.5e6 Hz
+    k_parallel : float, optional
+        k_parallel value to use. Default is 11 m^-1
+    B : float, optional
+        magnetic field. The default is 3.2 T.
+
+    Returns
+    -------
+    ne_co: float
+        cut-off density in m^-3
+
+    '''
+    from astropy import units as u
+    from plasmapy.formulary import gyrofrequency
+    from plasmapy.formulary.dielectric import cold_plasma_permittivity_LRP
+    omega_0 = 2*pi*f
+    k0 = omega_0/c
+    n_parallel = k_parallel/k0
+    # assume Deuterium plasma only
+    plasma=('e-','D+')
+    # make a density constant (for constant magnetic field)
+    ne = np.linspace(1e17, 1e20, 1001)    
+    L, R, P = cold_plasma_permittivity_LRP(species=plasma, n=[ne/u.m**3]*len(plasma), 
+                                           B=B*u.T, omega=omega_0*u.rad/u.s)
+    idx_co =  np.argmin(np.abs(R - n_parallel**2))
+    ne_co = ne[idx_co]
+    
+    return ne_co
+    
+
+def cutoff_radius(reflecto_data, f=55.5e6, k_parallel=11):
+    '''
+    Return the fast-Wave cut-off radial location defined for n//^2 = R 
+
+    Parameters
+    ----------
+    reflecto_data : dict
+        Reflectometry data, containing 'REX', 'NEX' and 'tX' arrays
+    f : float, optional
+        RF Frequency. The default is 55.5e6
+    k_parallel : float, optional
+        k_parallel value to use. Default is 11 m^-1
+
+    Returns
+    -------
+    R_co: array
+        cut-off radial location in meter
+    t_co: array
+        associated time array
+    ne_co: float
+        cut-off density in m^-3
+
+    '''
+    # approximate cut-off density
+    ne_co = cutoff_density_fw_approx(f=f)
+    
+    # determine the cutoff radius, ie the radius for which ne=ne_co
+    idx_R_co = np.argmin(np.abs(reflecto_data['NEX'] - ne_co), axis=0)
+    R_co = reflecto_data['RX'][idx_R_co, np.arange(reflecto_data['RX'].shape[1])]
+    return R_co, np.squeeze(reflecto_data['tX']), ne_co

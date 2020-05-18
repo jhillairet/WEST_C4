@@ -17,7 +17,7 @@ arg = json.loads(sys.argv[1])
 imas_obj_fname ='tmp_imas_data.npz'
 
 print(f"Getting IMAS IDS {arg['ids_name']}...")
-ids = imas_west.get(int(arg['pulse']), arg['ids_name'])
+ids = imas_west.get(int(arg['pulse']), ids_name=arg['ids_name'])
 
 data = []
 for path in arg['paths']:
@@ -25,4 +25,4 @@ for path in arg['paths']:
     data.append(eval(f"ids.{path}"))
 
 print(f'Saving IMAS object into: {imas_obj_fname}...')
-savez(imas_obj_fname, data=data)
+savez(imas_obj_fname, *data)
